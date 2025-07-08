@@ -1,0 +1,35 @@
+directive @auth(role: [String]) on FIELD_DEFINITION
+
+type Query {
+  currentUser: UserDto @auth(role: ["ROLE_USER", "ROLE_ADMIN"])
+}
+
+type Mutation {
+  broadcastMessages(broadCastInput: BroadcastRequestInput!): ResponseMessage!
+}
+
+type ResponseMessage {
+  status: String
+  message: String
+  data: String
+}
+
+type UserDto {
+  id: ID
+  name: String
+  email: String
+  roles: [String]
+}
+
+input BroadcastRequestInput {
+  template: String
+  templateId: ID
+  campName: String
+  country: String
+  countryId: ID
+  mobileNumbers: [String!]
+  isMedia: Boolean
+  mediaUrl: String
+  mediaType: String
+  scheduleDate: String
+}
