@@ -2,7 +2,7 @@ package com.aigreentick.services.messaging.service.interfaces;
 
 import org.springframework.data.domain.Page;
 
-import com.aigreentick.services.messaging.dto.TemplateDto;
+import com.aigreentick.services.messaging.dto.template.TemplateDto;
 
 public interface TemplateInterface {
     Page<TemplateDto> getTemplatesByUser(String email, String search, Integer page, Integer pageSize);

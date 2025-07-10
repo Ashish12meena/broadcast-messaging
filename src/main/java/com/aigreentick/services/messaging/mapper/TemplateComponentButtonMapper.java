@@ -2,7 +2,7 @@ package com.aigreentick.services.messaging.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.aigreentick.services.messaging.dto.TemplateComponentButtonDto;
+import com.aigreentick.services.messaging.dto.template.TemplateComponentButtonDto;
 import com.aigreentick.services.messaging.model.Template;
 import com.aigreentick.services.messaging.model.TemplateComponent;
 import com.aigreentick.services.messaging.model.TemplateComponentButton;

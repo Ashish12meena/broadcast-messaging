@@ -11,8 +11,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.aigreentick.services.chat.enums.MessageStatus;
 import com.aigreentick.services.chat.enums.MessageType;
+import com.aigreentick.services.common.enums.MessageStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,7 +44,7 @@ public class ChatMessage{
 
     private Map<String, Object> metadata; // optional (file size, duration)
 
-    private MessageStatus status; // SENT, DELIVERED, SEEN
+    private MessageStatusEnum status; // SENT, DELIVERED, SEEN
 
     @CreationTimestamp
     private Instant createdAt;

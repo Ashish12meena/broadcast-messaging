@@ -1,4 +1,4 @@
-package com.aigreentick.services.messaging.dto;
+package com.aigreentick.services.messaging.dto.template;
 
 
 import lombok.AllArgsConstructor;

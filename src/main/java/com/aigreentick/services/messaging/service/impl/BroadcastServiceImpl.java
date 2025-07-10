@@ -8,20 +8,24 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.auth.repository.UserRepository;
-import com.aigreentick.services.common.constants.CommonConstants;
+
 import com.aigreentick.services.common.dto.ResponseMessage;
+import com.aigreentick.services.common.enums.MessageStatusEnum;
 import com.aigreentick.services.common.service.impl.BlacklistServiceImpl;
 import com.aigreentick.services.messaging.constants.MessagingConstants;
 import com.aigreentick.services.messaging.dto.BroadcastRequestDTO;
 import com.aigreentick.services.messaging.enums.BroadcastStatus;
+import com.aigreentick.services.messaging.enums.ReportStatus;
 import com.aigreentick.services.messaging.model.Broadcast;
 import com.aigreentick.services.messaging.model.BroadcastMedia;
 import com.aigreentick.services.messaging.model.Country;
@@ -84,15 +88,15 @@ public class BroadcastServiceImpl implements BroadcastInterface {
 
         CompletableFuture<User> userFuture = CompletableFuture
                 .supplyAsync(() -> userRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("User not found")));
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found")));
 
         CompletableFuture<Template> templateFuture = CompletableFuture
                 .supplyAsync(() -> templateRepository.findById(dto.getTemplateId())
-                        .orElseThrow(() -> new RuntimeException("Template not found")));
+                        .orElseThrow(() -> new ResourceNotFoundException("Template not found")));
 
         CompletableFuture<Country> countryFuture = CompletableFuture
-                .supplyAsync(() -> countryRepository.findByName(dto.getCountry())
-                        .orElseThrow(() -> new RuntimeException("Country not found")));
+                .supplyAsync(() -> countryRepository.findById(dto.getCountryId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Country not found")));
 
         // WhatsappAccount config =
         // whatsappAccountRepository.findByUserIdAndStatus(user.getId(), true)
@@ -112,7 +116,7 @@ public class BroadcastServiceImpl implements BroadcastInterface {
         List<Report> reports = buildPendingReports(dto, filteredMobileNumbers, campaignId, broadcastId, user);
         List<List<Report>> chunkedReports = MessagingUtil.chunkList(reports, MessagingConstants.BATCH_SIZE);
 
-        saveAndProcessReports(chunkedReports, dto.getTemplate());
+        saveAndProcessReports(chunkedReports, template.getName());
 
         long duration = System.currentTimeMillis() - start;
         log.info("Broadcast completed for {} numbers in {} ms", reports.size(), duration);
@@ -129,8 +133,8 @@ public class BroadcastServiceImpl implements BroadcastInterface {
             report.setBroadcastId(broadcastId);
             report.setUserId(user.getId());
             report.setMobile(mobile);
-            report.setStatus(CommonConstants.STATUS_PENDING);
-            report.setMessageStatus(CommonConstants.STATUS_PENDING);
+            report.setStatus(ReportStatus.PENDING);
+            report.setMessageStatus(MessageStatusEnum.PENDING);
             report.setCreatedAt(now);
             report.setUpdatedAt(now);
             return report;
@@ -148,7 +152,7 @@ public class BroadcastServiceImpl implements BroadcastInterface {
         broadcast.setUser(user);
         broadcast.setTemplate(template);
         broadcast.setCountry(country);
-        broadcast.setCampanyName(dto.getCampName());
+        broadcast.setCampanyName(dto.getCampanyName());
         broadcast.setMedia(dto.isMedia());
         broadcast.setTotalSent(dto.getMobileNumbers().size());
         broadcast.setRecipients(String.join(",", filteredMobileNumbers));

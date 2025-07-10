@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.aigreentick.services.messaging.dto.TemplateComponentButtonDto;
-import com.aigreentick.services.messaging.dto.TemplateComponentDto;
+import com.aigreentick.services.messaging.dto.template.TemplateComponentButtonDto;
+import com.aigreentick.services.messaging.dto.template.TemplateComponentDto;
 import com.aigreentick.services.messaging.model.Template;
 import com.aigreentick.services.messaging.model.TemplateComponent;
 import com.aigreentick.services.messaging.model.TemplateComponentButton;

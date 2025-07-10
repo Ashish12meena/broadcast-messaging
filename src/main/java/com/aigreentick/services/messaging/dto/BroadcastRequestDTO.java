@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class BroadcastRequestDTO {
-    private String template;
+    // private String template;
     private Long templateId;
-    private String campName;
-    private String country;
+    private String campanyName;
+    // private String country;
     private Long countryId;
     private List<String> mobileNumbers;
     private boolean isMedia;

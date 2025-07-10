@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.aigreentick.services.messaging.dto.ReportResponseDto;
+import com.aigreentick.services.messaging.dto.report.ReportResponseDto;
 import com.aigreentick.services.messaging.model.Report;
 
 

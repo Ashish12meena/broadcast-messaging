@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.aigreentick.services.messaging.dto.ReportResponseDto;
+import com.aigreentick.services.messaging.dto.report.ReportResponseDto;
 import com.aigreentick.services.messaging.model.Report;
 
 public interface ReportInterface {

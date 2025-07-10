@@ -1,7 +1,7 @@
 package com.aigreentick.services.messaging.enums;
 
 public enum BroadcastStatus {
-     SCHEDULED,
+    SCHEDULED,
     SENDING,
     COMPLETED,
     PARTIALLY_FAILED,

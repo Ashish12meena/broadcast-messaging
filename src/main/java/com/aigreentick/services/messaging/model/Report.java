@@ -7,6 +7,9 @@ import java.util.Map;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.aigreentick.services.common.enums.MessageStatusEnum;
+import com.aigreentick.services.messaging.enums.ReportStatus;
+
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,9 +47,9 @@ public class Report {
 
     private String waId;
 
-    private String messageStatus;
+    private MessageStatusEnum messageStatus;
 
-    private String status;
+    private ReportStatus status;
 
     private Map<String, Object> response;
 

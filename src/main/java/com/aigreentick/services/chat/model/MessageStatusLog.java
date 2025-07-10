@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.aigreentick.services.chat.enums.MessageStatus;
+import com.aigreentick.services.common.enums.MessageStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +28,7 @@ public class MessageStatusLog {
     @Indexed
     private Long userId;
 
-    private MessageStatus status; // SENT, DELIVERED, SEEN
+    private MessageStatusEnum status; // SENT, DELIVERED, SEEN
 
     private Instant statusUpdatedAt;
 }

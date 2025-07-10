@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.aigreentick.services.common.enums.MessageStatusEnum;
+
 @Service
 public class WhatsappServiceImpl {
      public Map<String, Object> sendMessage(String mobile, String message) {
@@ -16,7 +18,7 @@ public class WhatsappServiceImpl {
             Thread.currentThread().interrupt();
         }
         Map<String, Object> response = new HashMap<>();
-        response.put("status", "DELIVERED");
+        response.put("status", MessageStatusEnum.DELIVERED);
         response.put("messageId", UUID.randomUUID().toString());
         response.put("waId", UUID.randomUUID().toString());
         return response;

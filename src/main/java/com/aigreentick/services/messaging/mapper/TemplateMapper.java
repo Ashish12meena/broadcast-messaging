@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.aigreentick.services.auth.model.User;
-import com.aigreentick.services.messaging.dto.TemplateComponentDto;
-import com.aigreentick.services.messaging.dto.TemplateDto;
+import com.aigreentick.services.messaging.dto.template.TemplateComponentDto;
+import com.aigreentick.services.messaging.dto.template.TemplateDto;
 import com.aigreentick.services.messaging.enums.TemplateStatus;
 import com.aigreentick.services.messaging.model.Template;
 import com.aigreentick.services.messaging.model.TemplateComponent;
@@ -54,6 +54,7 @@ public class TemplateMapper {
         template.setCategory(dto.getCategory());
         template.setWaId(dto.getWaId());
         template.setPayload(dto.getPayload());
+        template.setLanguage(dto.getLanguage());
         template.setStatus(TemplateStatus.pending);
 
         // Convert component DTOs to entities
