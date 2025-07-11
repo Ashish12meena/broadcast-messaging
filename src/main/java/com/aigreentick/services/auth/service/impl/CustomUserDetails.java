@@ -1,7 +1,8 @@
 package com.aigreentick.services.auth.service.impl;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,12 +23,12 @@ public class CustomUserDetails implements UserDetails {
         return user.getId();
     }
 
-    public Long getRoleId() {
-        return user.getRole().getId();
+    public List<Long> getRoleId() {
+        return user.getRoles().stream().map(role -> role.getId()).collect(Collectors.toList());
     }
 
-    public RoleType getRoleName() {
-        return user.getRole().getName();
+    public List<RoleType> getRoleName() {
+        return user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toList());
     }
 
     @Override
@@ -42,8 +43,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        RoleType roleName = user.getRole().getName();
-        return Collections.singletonList(new SimpleGrantedAuthority(roleName.toString()));
+        return user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toSet());
     }
 
     @Override

@@ -36,9 +36,10 @@ public class UserMapper {
         dto.setMobileNumber(user.getMobileNumber());
         dto.setCompanyName(user.getCompanyName());
         dto.setProfileUrl(user.getProfilePhoto());
-        if (user.getRole()!=null) {
-            dto.setRole(roleMapper.toRoleResponseDto(user.getRole()));
+        if (user.getRoles()!=null) {
+            dto.setRole(roleMapper.toRoleResponseDtoSet(user.getRoles()));
         }
         return dto;
     }
+
 }

@@ -1,6 +1,8 @@
 package com.aigreentick.services.auth.dto;
 
 
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,6 @@ public class UserResponseDto {
     private String mobileNumber;
     private String companyName;
     private String profileUrl;
-    private RoleResponseDto role;
+    private Set<RoleResponseDto> role;
 }
 

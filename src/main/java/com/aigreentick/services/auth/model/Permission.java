@@ -6,6 +6,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,7 @@ public class Permission {
     private Long id;
 
     @ManyToMany(mappedBy = "permissions")
+    @JsonIgnore // prevent recursion in JSON
     private List<Role> roles;
 
     @Column(nullable = false, unique = true, length = 100)

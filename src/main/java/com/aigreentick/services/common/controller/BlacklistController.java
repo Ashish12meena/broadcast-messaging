@@ -23,7 +23,7 @@ public class BlacklistController {
     BlacklistInterface blacklistService;
 
     // // blacklist a user
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<ResponseMessage<String>> add(@RequestBody @Valid BlacklistRequestDto request,
             @AuthenticationPrincipal CustomUserDetails user) {
         Long senderId = user.getId();

@@ -1,6 +1,7 @@
 package com.aigreentick.services.auth.mapper;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -22,5 +23,11 @@ public class RoleMapper {
         return roles.stream()
                     .map(this::toRoleResponseDto)
                     .collect(Collectors.toList());
+    }
+
+      public Set<RoleResponseDto> toRoleResponseDtoSet(Set<Role> roles) {
+        return roles.stream()
+                    .map(this::toRoleResponseDto)
+                    .collect(Collectors.toSet());
     }
 }

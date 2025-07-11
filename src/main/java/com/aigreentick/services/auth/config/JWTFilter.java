@@ -1,7 +1,7 @@
 package com.aigreentick.services.auth.config;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -71,14 +71,15 @@ public class JWTFilter extends OncePerRequestFilter {
                 }
 
                 Long userId = jwtService.extractUserId(token);
-                User user = userRepository.findByIdWithRoleAndPermissions(userId)
+                User user = userRepository.findByIdWithRolesAndPermissions(userId)
                         .orElseThrow(() -> new RuntimeException("User not found"));
 
-                List<SimpleGrantedAuthority> authorities = user.getRole().getPermissions().stream()
+                Set<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+                        .flatMap(role -> role.getPermissions().stream())
                         .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toSet());
 
-                authorities.add(new SimpleGrantedAuthority(user.getRole().getName().name())); 
+                user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName().name())));
 
                 CustomUserDetails userDetails = new CustomUserDetails(user);
 

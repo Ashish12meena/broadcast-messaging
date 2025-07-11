@@ -1,5 +1,8 @@
 package com.aigreentick.services.auth.service.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,7 +45,9 @@ public class AuthServiceImpl implements AuthService {
         RoleType roleName = normalizeRole(request.getRole().name());
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName));
-        user.setRole(role);
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
         userRepository.save(user);
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         String authToken = jwtProvider.generateToken(userDetails);

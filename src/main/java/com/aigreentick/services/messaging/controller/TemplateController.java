@@ -1,7 +1,5 @@
 package com.aigreentick.services.messaging.controller;
 
-import java.security.Principal;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aigreentick.services.auth.service.impl.CustomUserDetails;
 import com.aigreentick.services.common.dto.ResponseMessage;
+import com.aigreentick.services.messaging.dto.PaginationRequestDto;
 import com.aigreentick.services.messaging.dto.template.TemplateDto;
 import com.aigreentick.services.messaging.dto.template.TemplateUpdateRequest;
 import com.aigreentick.services.messaging.service.impl.TemplateServiceImpl;
@@ -40,11 +39,10 @@ public class TemplateController {
     @GetMapping
     public ResponseEntity<?> getUserTemplates(
             @RequestParam(name = "search", required = false) String search,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
-            Principal principal) {
-        String userEmail = principal.getName();
-        Page<TemplateDto> templates = templateService.getTemplatesByUser(userEmail, search, page, size);
+            @Valid PaginationRequestDto pagination,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String userEmail = customUserDetails.getUsername();
+        Page<TemplateDto> templates = templateService.getTemplatesByUser(userEmail, search, pagination.getPage(), pagination.getSize());
         return ResponseEntity.ok(new ResponseMessage<>("success", "Templates fetched successfully", templates));
     }
 
