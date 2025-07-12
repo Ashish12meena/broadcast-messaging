@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.aigreentick.services.auth.dto.RoleResponseDto;
+import com.aigreentick.services.auth.dto.role.RoleResponseDto;
 import com.aigreentick.services.auth.model.Role;
 
 @Component

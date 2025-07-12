@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aigreentick.services.auth.constants.AuthConstants;
-import com.aigreentick.services.auth.dto.AuthResponse;
 import com.aigreentick.services.auth.dto.LoginRequest;
 import com.aigreentick.services.auth.dto.RegisterRequest;
-import com.aigreentick.services.auth.dto.RoleResponseDto;
+import com.aigreentick.services.auth.dto.role.RoleResponseDto;
+import com.aigreentick.services.auth.dto.user.AuthResponse;
 import com.aigreentick.services.auth.service.interfaces.AuthService;
 import com.aigreentick.services.auth.service.interfaces.RoleService;
 import com.aigreentick.services.common.dto.ResponseMessage;
@@ -34,14 +34,14 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest input) {
         AuthResponse authResponse = authService.register(input);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseMessage<>(ResponseStatus.SUCCESS.name(),AuthConstants.USER_CREATED , authResponse));
+                .body(new ResponseMessage<>(ResponseStatus.SUCCESS.name(),AuthConstants.USER_CREATED_SUCCESS , authResponse));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest input) {
         AuthResponse authResponse = authService.login(input);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseMessage<>(ResponseStatus.SUCCESS.name(), AuthConstants.USER_LOGIN, authResponse));
+                .body(new ResponseMessage<>(ResponseStatus.SUCCESS.name(), AuthConstants.USER_LOGIN_SUCCESS, authResponse));
     }
 
     @PostMapping("/get-roles")

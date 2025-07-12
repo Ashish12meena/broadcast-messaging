@@ -1,6 +1,9 @@
 package com.aigreentick.services.auth.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
+
+
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,11 +12,16 @@ import org.springframework.stereotype.Service;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.auth.repository.UserRepository;
+import com.aigreentick.services.auth.service.interfaces.UserService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
-public class UserServiceImpl {
-      @Autowired
-    UserRepository userRepository;
+@RequiredArgsConstructor
+@Slf4j
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
 
     // Get the currently authenticated user.
     public CustomUserDetails getCurrentUser() {
@@ -25,14 +33,21 @@ public class UserServiceImpl {
     }
 
     public User findByEmail(String email) {
-        
+
         return userRepository.findByUsername(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email " + email));
     }
 
     public boolean isMobileNumberExist(String mobileNumber) {
-        if (mobileNumber == null) return false;
+        if (mobileNumber == null)
+            return false;
         return userRepository.existsByMobileNumber(mobileNumber);
     }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+   
 
 }

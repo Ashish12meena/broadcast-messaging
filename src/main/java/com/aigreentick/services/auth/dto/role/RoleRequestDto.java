@@ -1,4 +1,4 @@
-package com.aigreentick.services.auth.dto;
+package com.aigreentick.services.auth.dto.role;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -13,3 +13,4 @@ public class RoleRequestDto {
 
     private String description;
 }
+    

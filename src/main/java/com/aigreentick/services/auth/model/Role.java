@@ -52,7 +52,7 @@ public class Role {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
         name = "role_permissions",
         joinColumns = @JoinColumn(name = "role_id"),

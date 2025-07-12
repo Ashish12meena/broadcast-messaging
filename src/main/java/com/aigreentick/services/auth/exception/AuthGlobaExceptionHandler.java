@@ -44,4 +44,13 @@ public class AuthGlobaExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 buildError("error", ex.getMessage(), request.getRequestURI(), HttpStatus.BAD_REQUEST));
     }
+
+    @ExceptionHandler(PermissionAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handlePermissionAlreadyExists(PermissionAlreadyExistsException ex,
+            HttpServletRequest request) {
+        log.warn("Permission already exists: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                buildError("error", ex.getMessage(), request.getRequestURI(), HttpStatus.BAD_REQUEST));
+    }
+
 }

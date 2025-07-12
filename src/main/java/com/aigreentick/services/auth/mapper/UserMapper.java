@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.aigreentick.services.auth.dto.RegisterRequest;
-import com.aigreentick.services.auth.dto.UserResponseDto;
+import com.aigreentick.services.auth.dto.user.UserResponseDto;
 import com.aigreentick.services.auth.model.User;
 
 @Component

@@ -1,4 +1,4 @@
-package com.aigreentick.services.auth.dto;
+package com.aigreentick.services.auth.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

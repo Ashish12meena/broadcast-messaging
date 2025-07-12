@@ -1,7 +1,7 @@
 package com.aigreentick.services.auth.service.impl;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,9 +11,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.aigreentick.services.auth.config.TokenProvider;
-import com.aigreentick.services.auth.dto.AuthResponse;
 import com.aigreentick.services.auth.dto.LoginRequest;
 import com.aigreentick.services.auth.dto.RegisterRequest;
+import com.aigreentick.services.auth.dto.user.AuthResponse;
 import com.aigreentick.services.auth.enums.RoleType;
 import com.aigreentick.services.auth.exception.EmailAlreadyExistsException;
 import com.aigreentick.services.auth.exception.MobileNumberAlreadyExistsException;
@@ -21,6 +21,7 @@ import com.aigreentick.services.auth.exception.RoleNotFoundException;
 import com.aigreentick.services.auth.mapper.UserMapper;
 import com.aigreentick.services.auth.model.Role;
 import com.aigreentick.services.auth.model.User;
+import com.aigreentick.services.auth.model.UserPermission;
 import com.aigreentick.services.auth.repository.RoleRepository;
 import com.aigreentick.services.auth.repository.UserRepository;
 import com.aigreentick.services.auth.service.interfaces.AuthService;
@@ -38,19 +39,51 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Registers a new user with a role and automatically assigns default
+     * permissions from the role.
+     *
+     * Steps:
+     * - Validates username and mobile number uniqueness
+     * - Maps DTO to entity
+     * - Normalizes and fetches role
+     * - Assigns role and corresponding permissions (via UserPermission mapping)
+     * - Saves user with all relations
+     * - Generates JWT token
+     *
+     * @param request the registration details
+     * @return AuthResponse containing JWT and user info
+     */
     @Override
     public AuthResponse register(RegisterRequest request) {
+        // Step 1: Validate unique mobile and username
         checkMobileAndUsernameUniqueness(request.getMobileNumber(), request.getUsername());
+
+        // Step 2: Convert request DTO to User entity
         User user = userMapper.toUser(request);
-        RoleType roleName = normalizeRole(request.getRole().name());
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName));
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
+
+        // Step 3: Normalize role input (e.g., convert "admin" to "ROLE_ADMIN") and
+        // fetch from DB
+        RoleType normalizedRole = normalizeRole(request.getRole().name());
+        Role role = roleRepository.findByName(normalizedRole)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + normalizedRole));
+
+        // Step 4: Assign role to user
+        user.setRoles(Set.of(role));
+
+        // Step 5: Convert Role's permissions to UserPermission mappings
+        Set<UserPermission> userPermissionMappings = mapRolePermissionsToUser(user, role);
+
+        // Step 6: Set mapped permissions to user
+        user.setUserPermissions(userPermissionMappings);
+
+        // Step 7: Persist user with roles and permissions
         userRepository.save(user);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+
+        // Step 8: Generate JWT token for immediate login
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String authToken = jwtProvider.generateToken(userDetails);
+
         return new AuthResponse(authToken, userMapper.toUserResponseDto(user));
     }
 
@@ -106,6 +139,15 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(username, rawPassword));
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return jwtProvider.generateToken(userDetails);
+    }
+
+    private Set<UserPermission> mapRolePermissionsToUser(User user, Role role) {
+        return role.getPermissions().stream().map(permission -> {
+            UserPermission userPermission = new UserPermission();
+            userPermission.setUser(user);
+            userPermission.setPermission(permission);
+            return userPermission;
+        }).collect(Collectors.toSet());
     }
 
 }

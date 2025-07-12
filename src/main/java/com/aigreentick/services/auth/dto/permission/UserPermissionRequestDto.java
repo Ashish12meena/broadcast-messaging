@@ -1,4 +1,4 @@
-package com.aigreentick.services.auth.dto;
+package com.aigreentick.services.auth.dto.permission;
 
 import lombok.Data;
 

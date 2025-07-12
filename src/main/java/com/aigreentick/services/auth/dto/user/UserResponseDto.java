@@ -1,7 +1,9 @@
-package com.aigreentick.services.auth.dto;
+package com.aigreentick.services.auth.dto.user;
 
 
 import java.util.Set;
+
+import com.aigreentick.services.auth.dto.role.RoleResponseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

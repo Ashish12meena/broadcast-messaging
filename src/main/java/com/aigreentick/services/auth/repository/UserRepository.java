@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.aigreentick.services.auth.model.Role;
 import com.aigreentick.services.auth.model.User;
 
 @Repository

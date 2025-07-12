@@ -8,8 +8,9 @@ import org.apache.kafka.common.errors.DuplicateResourceException;
 import org.apache.kafka.common.errors.InvalidRequestException;
 import org.springframework.stereotype.Service;
 
-import com.aigreentick.services.auth.dto.RoleResponseDto;
-import com.aigreentick.services.auth.dto.UserResponseDto;
+import com.aigreentick.services.auth.dto.role.RoleDto;
+import com.aigreentick.services.auth.dto.role.RoleResponseDto;
+import com.aigreentick.services.auth.dto.user.UserResponseDto;
 import com.aigreentick.services.auth.enums.RoleType;
 import com.aigreentick.services.auth.exception.RoleNotFoundException;
 import com.aigreentick.services.auth.exception.UserNotFoundException;
@@ -45,15 +46,22 @@ public class RoleServiceImpl implements RoleService {
     public void addRole(String name, String description) {
         log.info("Attempting to add new role: {}", name);
 
+        RoleType roleType;
+        try {
+            roleType = RoleType.valueOf(name);
+        } catch (IllegalArgumentException ex) {
+            log.warn("Invalid role name provided for removal: {}", name);
+            throw new InvalidRequestException("Invalid role name: " + name);
+        }
+
         // Check for duplicate
-        boolean exists = roleRepository.existsByName(name);
+        boolean exists = roleRepository.existsByName(roleType);
         if (exists) {
             log.warn("Role creation failed: Role with name '{}' already exists", name);
             throw new DuplicateResourceException("Role already exists with name: " + name);
         }
 
         try {
-            RoleType roleType = RoleType.valueOf(name);
             Role role = new Role();
             role.setName(roleType); // Enum, not String
             role.setDescription(description);
@@ -125,6 +133,21 @@ public class RoleServiceImpl implements RoleService {
         userRepository.save(user);
         return userMapper.toUserResponseDto(user);
         
+    }
+
+    @Override
+    public List<RoleDto> getAllRolesForUser(Long userId) {
+        User user = userRepository.findByIdWithRoles(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        if (user.getRoles().isEmpty()) {
+            log.warn("User with ID {} has no roles assigned", userId);
+            throw new RoleNotFoundException("No roles assigned to user with ID: " + userId);
+        }
+
+        return user.getRoles().stream()
+                .map(role -> new RoleDto(role.getId(), role.getName().name()))
+                .toList();
     }
 
 }
