@@ -2,7 +2,6 @@ package com.aigreentick.services.messaging.service.impl;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -30,7 +29,7 @@ import com.aigreentick.services.messaging.model.Broadcast;
 import com.aigreentick.services.messaging.model.BroadcastMedia;
 import com.aigreentick.services.messaging.model.Country;
 import com.aigreentick.services.messaging.model.Report;
-import com.aigreentick.services.messaging.model.Template;
+import com.aigreentick.services.messaging.model.template.Template;
 import com.aigreentick.services.messaging.repository.BroadCastMediaRepository;
 import com.aigreentick.services.messaging.repository.BroadCastRepository;
 import com.aigreentick.services.messaging.repository.CountryRepository;
@@ -91,7 +90,7 @@ public class BroadcastServiceImpl implements BroadcastInterface {
                         .orElseThrow(() -> new UsernameNotFoundException("User not found")));
 
         CompletableFuture<Template> templateFuture = CompletableFuture
-                .supplyAsync(() -> templateRepository.findById(dto.getTemplateId())
+                .supplyAsync(() -> templateRepository.findById(dto.getTemlateId())
                         .orElseThrow(() -> new ResourceNotFoundException("Template not found")));
 
         CompletableFuture<Country> countryFuture = CompletableFuture
@@ -109,6 +108,11 @@ public class BroadcastServiceImpl implements BroadcastInterface {
         List<String> filteredMobileNumbers = filteredMobileNumbersFuture.join();
 
         Broadcast broadcast = createAndSaveBroadcast(dto, filteredMobileNumbers, user, country, template);
+
+        if ((dto.getScheduledAt() != null) || (broadcast.getStatus() == BroadcastStatus.SCHEDULED)) {
+            return new ResponseMessage<>("Success", "Broadcast scheduled successfully at:  " + dto.getScheduledAt() + "",
+                    null);
+        }
 
         Long campaignId = null;
         Long broadcastId = broadcast.getId();
@@ -153,19 +157,17 @@ public class BroadcastServiceImpl implements BroadcastInterface {
         broadcast.setTemplate(template);
         broadcast.setCountry(country);
         broadcast.setCampanyName(dto.getCampanyName());
+        broadcast.setWhatsappId(template.getWhatsappId());
         broadcast.setMedia(dto.isMedia());
-        broadcast.setTotalSent(dto.getMobileNumbers().size());
+        broadcast.setTotalNumbers(dto.getMobileNumbers().size());
         broadcast.setRecipients(String.join(",", filteredMobileNumbers));
         broadcast.setStatus(BroadcastStatus.SENDING);
-        if (dto.getScheduleDate() != null) {
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-                LocalDateTime schedule = LocalDateTime.parse(dto.getScheduleDate(), formatter);
-                broadcast.setScheduleAt(schedule);
-                broadcast.setStatus(BroadcastStatus.SCHEDULED);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid date format. Expected: dd.MM.yyyy HH:mm");
+        if (dto.getScheduledAt() != null) {
+            if (dto.getScheduledAt().isBefore(LocalDateTime.now())) {
+                throw new IllegalArgumentException("Schedule date must be in the future.");
             }
+            broadcast.setScheduleAt(dto.getScheduledAt());
+            broadcast.setStatus(BroadcastStatus.SCHEDULED);
         }
         broadCastRepository.save(broadcast);
         if (dto.isMedia()) {
@@ -214,4 +216,3 @@ public class BroadcastServiceImpl implements BroadcastInterface {
     }
 
 }
-

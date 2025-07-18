@@ -1,10 +1,12 @@
-package com.aigreentick.services.messaging.model;
+package com.aigreentick.services.messaging.model.template;
 
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,10 +25,12 @@ public class TemplateComponentButton {
 
      @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", nullable = false, foreignKey = @ForeignKey(name = "fk_template_component_buttons_template"))
+    @JsonBackReference
     private Template template;
 
      @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "component_id", nullable = false)
+    @JsonBackReference
     private TemplateComponent component; 
 
     @Column(name = "type", nullable = false, length = 50)

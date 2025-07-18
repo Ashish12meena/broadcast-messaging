@@ -1,10 +1,10 @@
-package com.aigreentick.services.messaging.model;
+package com.aigreentick.services.messaging.model.group;
 
 
-import java.time.ZonedDateTime;
-
+import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.aigreentick.services.auth.model.User;
+import com.aigreentick.services.messaging.model.template.Template;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,14 +27,17 @@ public class SendByGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User initiatedBy;
 
-    @Column(name = "template_id", nullable = false)
-    private Long templateId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "template_id", nullable = false)
+    private Template template;
 
-    @Column(name = "group_id", nullable = false)
-    private Long groupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", nullable = false)
+    private Group group;
 
     @Column(name = "country_id")
     private Integer countryId;
@@ -49,16 +52,15 @@ public class SendByGroup {
     private boolean status = false;
 
     @Column(name = "schedule_at")
-    private ZonedDateTime scheduleAt;
+    private LocalDateTime scheduleAt;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private ZonedDateTime createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private ZonedDateTime updatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private LocalDateTime deletedAt;
 }

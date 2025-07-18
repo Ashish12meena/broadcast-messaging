@@ -1,20 +1,21 @@
 package com.aigreentick.services.messaging.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.constraints.Future;
 import lombok.Data;
 
 @Data
 public class BroadcastRequestDTO {
-    // private String template;
-    private Long templateId;
+    private Long temlateId;
     private String campanyName;
-    // private String country;
     private Long countryId;
     private List<String> mobileNumbers;
     private boolean isMedia;
     private String mediaUrl;
     private String mediaType;
-    private String scheduleDate;    
 
+    @Future(message = "Schedule date must be in the future")
+    private LocalDateTime scheduledAt;    
 }

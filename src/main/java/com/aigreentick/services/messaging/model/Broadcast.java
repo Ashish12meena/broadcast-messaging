@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.messaging.enums.BroadcastStatus;
+import com.aigreentick.services.messaging.model.template.Template;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -58,8 +59,8 @@ public class Broadcast {
     @Column(name = "campany_name")
     private String campanyName;
 
-    @Column(name = "whatsapp")
-    private Integer whatsapp;
+    @Column(name = "whatsapp_id")
+    private String whatsappId;
 
     @Column(name = "is_media")
     private boolean isMedia = false;
@@ -67,11 +68,8 @@ public class Broadcast {
     @Column(columnDefinition = "text")
     private String data;
 
-    @Column(name = "total_sent", nullable = false)
-    private Integer totalSent = 0;
-
-    @Column(name = "total_failed", nullable = false)
-    private Integer totalFailed = 0;
+    @Column(name = "total_numbers", nullable = false)
+    private Integer totalNumbers = 0;
 
     @Column(name = "schedule_at")
     private LocalDateTime scheduleAt;

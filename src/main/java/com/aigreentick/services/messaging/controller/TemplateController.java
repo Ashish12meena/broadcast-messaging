@@ -1,7 +1,6 @@
 package com.aigreentick.services.messaging.controller;
 
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aigreentick.services.auth.service.impl.CustomUserDetails;
 import com.aigreentick.services.common.dto.ResponseMessage;
 import com.aigreentick.services.messaging.dto.PaginationRequestDto;
+import com.aigreentick.services.messaging.dto.template.FacebookApiCredentialsDto;
+import com.aigreentick.services.messaging.dto.template.FacebookTemplateResponse;
 import com.aigreentick.services.messaging.dto.template.TemplateDto;
+import com.aigreentick.services.messaging.dto.template.TemplateRequestDto;
+import com.aigreentick.services.messaging.dto.template.TemplateResponseDto;
 import com.aigreentick.services.messaging.dto.template.TemplateUpdateRequest;
 import com.aigreentick.services.messaging.service.impl.TemplateServiceImpl;
 
@@ -36,20 +39,23 @@ public class TemplateController {
      * Get all templates for the authenticated user with optional search and
      * pagination.
      */
-    @GetMapping
+    @GetMapping("/my-templates")
     public ResponseEntity<?> getUserTemplates(
             @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "status", required = false) String status,
             @Valid PaginationRequestDto pagination,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         String userEmail = customUserDetails.getUsername();
-        Page<TemplateDto> templates = templateService.getTemplatesByUser(userEmail, search, pagination.getPage(), pagination.getSize());
+        Page<TemplateResponseDto> templates = templateService.getTemplatesByUser(userEmail, status, search,
+                pagination.getPage(), pagination.getSize());
         return ResponseEntity.ok(new ResponseMessage<>("success", "Templates fetched successfully", templates));
     }
 
-    @PostMapping
-    public ResponseEntity<?> createTemplate(@RequestBody @Valid TemplateDto dto, @AuthenticationPrincipal CustomUserDetails currentUser) {
-        templateService.createTemplateForUser(dto, currentUser.getUsername());
-        return ResponseEntity.ok(new ResponseMessage<>("success", "Template created successfully", null));
+    @PostMapping("/create")
+    public ResponseEntity<?> createTemplate(@RequestBody @Valid TemplateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        FacebookTemplateResponse response = templateService.createTemplateForUser(dto, currentUser.getUsername());
+        return ResponseEntity.ok(new ResponseMessage<>("success", "Template created successfully", response));
     }
 
     @PutMapping("/update/{templateId}")
@@ -62,15 +68,15 @@ public class TemplateController {
     }
 
     @DeleteMapping("/delete/{templateId}")
-    public ResponseEntity<?> deleteMyTemplate(
+    public ResponseEntity<ResponseMessage<?>> deleteTemplate(
             @PathVariable Long templateId,
-            @AuthenticationPrincipal CustomUserDetails currentUser) {
-        boolean deleted = templateService.SoftDeleteTemplateByIdAndUser(templateId, currentUser.getUsername());
-        return deleted
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized or not found");
+            @AuthenticationPrincipal CustomUserDetails currentUser,
+            @RequestBody FacebookApiCredentialsDto credentials) {
+
+        TemplateDto deleted = templateService.deleteUserTemplateById(
+                currentUser.getUsername(),
+                templateId,
+                credentials);
+        return ResponseEntity.ok(new ResponseMessage<>("success", "Template deleted successfully", deleted));
     }
-
-    
-
 }

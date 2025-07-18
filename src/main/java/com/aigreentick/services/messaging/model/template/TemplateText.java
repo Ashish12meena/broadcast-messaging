@@ -1,4 +1,4 @@
-package com.aigreentick.services.messaging.model;
+package com.aigreentick.services.messaging.model.template;
 
 import java.time.ZonedDateTime;
 

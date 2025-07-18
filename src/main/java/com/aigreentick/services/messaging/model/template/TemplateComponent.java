@@ -1,4 +1,4 @@
-package com.aigreentick.services.messaging.model;
+package com.aigreentick.services.messaging.model.template;
 
 
 import java.time.LocalDateTime;
@@ -6,6 +6,9 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,6 +27,7 @@ public class TemplateComponent {
 
      @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", foreignKey = @ForeignKey(name = "fk_template_components_template"))
+    @JsonIgnore
     private Template template;
 
     @Column(name = "type", length = 50)
@@ -39,6 +43,7 @@ public class TemplateComponent {
     private String imageUrl;
 
     @OneToMany(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private List<TemplateComponentButton> componentsButtons;
 
     @CreationTimestamp

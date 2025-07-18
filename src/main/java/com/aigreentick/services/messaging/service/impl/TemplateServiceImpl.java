@@ -6,51 +6,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.auth.service.impl.UserServiceImpl;
+import com.aigreentick.services.messaging.dto.template.FacebookApiCredentialsDto;
+import com.aigreentick.services.messaging.dto.template.FacebookTemplateResponse;
 import com.aigreentick.services.messaging.dto.template.TemplateDto;
+import com.aigreentick.services.messaging.dto.template.TemplateRequestDto;
+import com.aigreentick.services.messaging.dto.template.TemplateResponseDto;
 import com.aigreentick.services.messaging.dto.template.TemplateStatsDto;
 import com.aigreentick.services.messaging.dto.template.TemplateUpdateRequest;
 import com.aigreentick.services.messaging.enums.TemplateStatus;
+import com.aigreentick.services.messaging.exception.ResponseStatusException;
+import com.aigreentick.services.messaging.exception.TemplateNotFoundException;
+import com.aigreentick.services.messaging.exception.UnauthorizedTemplateAccessException;
 import com.aigreentick.services.messaging.mapper.TemplateMapper;
-import com.aigreentick.services.messaging.model.Template;
-import com.aigreentick.services.messaging.model.TemplateComponent;
+import com.aigreentick.services.messaging.model.template.Template;
+import com.aigreentick.services.messaging.model.template.TemplateComponent;
 import com.aigreentick.services.messaging.repository.TemplateRepository;
-import com.aigreentick.services.messaging.service.interfaces.TemplateInterface;
+import com.aigreentick.services.whatsapp.service.impl.WhatsappServiceImpl;
 
 import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
 
 @Service
-public class TemplateServiceImpl implements TemplateInterface {
+@RequiredArgsConstructor
+public class TemplateServiceImpl {
     private final TemplateRepository templateRepository;
     private final TemplateMapper templateMapper;
     private final UserServiceImpl userService;
+    private final WhatsappServiceImpl whatsappService;
 
     @Value("${pagination.page-size}")
     private int defaultPageSize;
 
-    public TemplateServiceImpl(TemplateRepository templateRepository, TemplateMapper templateMapper,
-            UserServiceImpl userService) {
-        this.templateRepository = templateRepository;
-        this.templateMapper = templateMapper;
-        this.userService = userService;
-    }
-
     /**
      * Fetches paginated templates for the given user.
      */
-    @Override
-    public Page<TemplateDto> getTemplatesByUser(String email, String search, Integer page, Integer pageSize) {
+    // @Override
+    public Page<TemplateResponseDto> getTemplatesByUser(String email, String status, String search, Integer page,
+            Integer pageSize) {
         User user = userService.findByEmail(email);
         int sizeOfPage = (pageSize != null && pageSize > 0)
                 ? pageSize
@@ -58,10 +61,23 @@ public class TemplateServiceImpl implements TemplateInterface {
 
         Pageable pageable = PageRequest.of(page, sizeOfPage, Sort.by(Sort.Direction.DESC, "id"));
         Page<Template> templatePage;
-        if (search == null || search.isBlank()) {
-            templatePage = templateRepository.findByUser(user, pageable);
-        } else {
+        TemplateStatus statusEnum = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                statusEnum = TemplateStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid template status: " + status);
+            }
+        }
+        if (statusEnum != null && search != null && !search.isBlank()) {
+            templatePage = templateRepository.findByUserAndStatusAndNameContainingIgnoreCase(user, statusEnum, search,
+                    pageable);
+        } else if (statusEnum != null) {
+            templatePage = templateRepository.findByUserAndStatus(user, statusEnum, pageable);
+        } else if (search != null && !search.isBlank()) {
             templatePage = templateRepository.findByUserAndNameContainingIgnoreCase(user, search, pageable);
+        } else {
+            templatePage = templateRepository.findByUser(user, pageable);
         }
         return templatePage.map(templateMapper::toTemplateDto);
     }
@@ -69,11 +85,30 @@ public class TemplateServiceImpl implements TemplateInterface {
     /**
      * Create Template and save currently not approved by facebook.
      */
-    @Override
-    @Transactional
-    public void createTemplateForUser(TemplateDto templateDto, String email) {
+    public FacebookTemplateResponse createTemplateForUser(TemplateRequestDto templateDto, String email) {
+        if (templateRepository.findByName(templateDto.getName()).isPresent()) {
+            throw new RuntimeException("Template name already exists");
+        }
+
+        /* Hit Whatsapp api for template Creation */
+        FacebookTemplateResponse response = whatsappService.submitTemplateToFacebook(templateDto);
+
         User user = userService.findByEmail(email);
-        Template template = templateMapper.toTemplateEntity(templateDto, user);
+        Template template = templateMapper.toTemplateEntity(templateDto, user, response);
+        templateRepository.save(template);
+
+        // return response;
+        return response;
+
+        // return response;
+        // metaApiService.submitTemplateToMeta(template);
+    }
+
+    public void updateTemplateStatus(Long id, TemplateStatus status, String reason) {
+        Template template = templateRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
+        template.setStatus(status);
+        template.setRejectionReason(reason);
+        template.setUpdatedAt(LocalDateTime.now());
         templateRepository.save(template);
     }
 
@@ -98,10 +133,10 @@ public class TemplateServiceImpl implements TemplateInterface {
             template.setCategory(request.getCategory());
         if (request.getPreviousCategory() != null)
             template.setPreviousCategory(request.getPreviousCategory());
-        if (request.getWaId() != null)
-            template.setWaId(request.getWaId());
+        if (request.getWhatsappId() != null)
+            template.setWhatsappId(request.getWhatsappId());
         if (request.getPayload() != null)
-            template.setPayload(request.getPayload());
+            template.setSubmissionPayload(request.getPayload());
         if (request.getResponse() != null)
             template.setResponse(request.getResponse());
 
@@ -136,19 +171,33 @@ public class TemplateServiceImpl implements TemplateInterface {
         return true;
     }
 
-    public boolean deleteTemplateByIdAndUser(Long templateId, String username) {
-        Optional<Template> optionalTemplate = templateRepository.findById(templateId);
-        if (optionalTemplate.isEmpty())
-            return false;
+    public TemplateDto deleteUserTemplateById( String username,Long templateId,FacebookApiCredentialsDto accessCredentials) {
+        // 1. Validate template existence
+        Template template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new TemplateNotFoundException( "Template not found"));
 
-        Template template = optionalTemplate.get();
-
+        // 2. Check ownership
         if (template.getUser() == null || !template.getUser().getUsername().equals(username)) {
-            return false;
+            throw new UnauthorizedTemplateAccessException(
+                    "You do not have permission to delete this template");
         }
 
+        // 3. Call Facebook API to delete the template
+        boolean success = whatsappService.deleteTemplateFromFacebook(
+                template.getWhatsappId(),
+                template.getName(),
+                accessCredentials.getAccessToken(),
+                accessCredentials.getApiVersion());
+
+        // 4. Check if Facebook API call was successful
+        if (!success) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Failed to delete template from Facebook");
+        }
+
+        // 5. Delete from local DB
         templateRepository.delete(template);
-        return true;
+
+        return new TemplateDto(template);
     }
 
     public Page<Template> getAdminFilteredTemplates(

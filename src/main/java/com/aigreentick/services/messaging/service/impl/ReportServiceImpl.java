@@ -35,7 +35,7 @@ import com.aigreentick.services.messaging.mapper.ReportMapper;
 import com.aigreentick.services.messaging.model.Report;
 import com.aigreentick.services.messaging.repository.ReportRepository;
 import com.aigreentick.services.messaging.service.interfaces.ReportInterface;
-import com.aigreentick.services.whatsapp.service.WhatsappServiceImpl;
+import com.aigreentick.services.whatsapp.service.impl.WhatsappServiceImpl;
 import com.mongodb.client.result.UpdateResult;
 
 @Service

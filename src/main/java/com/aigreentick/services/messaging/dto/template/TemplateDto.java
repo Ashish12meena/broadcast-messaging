@@ -1,23 +1,26 @@
 package com.aigreentick.services.messaging.dto.template;
 
-import java.util.List;
+import com.aigreentick.services.messaging.model.template.Template;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class TemplateDto {
     private Long id;
-    private Long userId;
     private String name;
-    private String status;
     private String category;
-    private String email;
     private String language;
-    private String payload;
-     private String waId;
-     private List<TemplateComponentDto> components;
+    private String status;
+
+    public TemplateDto(Template template) {
+        this.id = template.getId();
+        this.name = template.getName();
+        this.category = template.getCategory();
+        this.language = template.getLanguage();
+        this.status = template.getStatus().name();
+    }
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.messaging.enums.TemplateStatus;
-import com.aigreentick.services.messaging.model.Template;
+import com.aigreentick.services.messaging.model.template.Template;
 
 @Repository
 public interface TemplateRepository extends JpaRepository<Template, Long> {
@@ -33,7 +33,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
     long countByStatus(TemplateStatus status);
 
-    List<Template> findByNameContainingIgnoreCaseOrWaIdContainingIgnoreCase(String name, String waId);
+    List<Template> findByNameContainingIgnoreCaseOrWhatsappIdContainingIgnoreCase(String name, String waId);
 
     Page<Template> findAll(Specification<Template> spec, Pageable pageable);
 
@@ -44,4 +44,13 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
     List<Object[]> countByCategoryGrouped();
 
     long countByDeletedAtIsNull();
+
+    List<Template> findByStatus(String status);
+
+    Optional<Template> findByName(String name);
+
+    Page<Template> findByUserAndStatusAndNameContainingIgnoreCase(User user, TemplateStatus statusEnum, String search,
+            Pageable pageable);
+
+    Page<Template> findByUserAndStatus(User user, TemplateStatus statusEnum, Pageable pageable);
 }
