@@ -1,8 +1,6 @@
-package com.aigreentick.services.messaging.model.group;
+package com.aigreentick.services.messaging.model.tag;
 
 import java.time.LocalDateTime;
-
-import com.aigreentick.services.auth.model.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,35 +17,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "group_members")
+@Table(name = "tag_numbers")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupMembers {
+public class TagNumber {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Phone number or contact identifier associated with the tag
+    @Column(nullable = false)
+    private String number;
+
+    // Parent tag reference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = false)
-    private Group group;
+    @JoinColumn(name = "tag_id", nullable = false)
+    private Tag tag;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_user_id", nullable = false)
-    private User memberUser;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "added_by")
-    private User addedBy;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
+    // Soft delete timestamp
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
-
 }

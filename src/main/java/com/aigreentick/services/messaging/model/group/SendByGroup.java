@@ -48,9 +48,6 @@ public class SendByGroup {
     @Column(nullable = false)
     private int total = 0;
 
-    @Column(nullable = false)
-    private boolean status = false;
-
     @Column(name = "schedule_at")
     private LocalDateTime scheduleAt;
 
