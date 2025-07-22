@@ -15,26 +15,26 @@ import com.aigreentick.services.messaging.model.tag.TagNumber;
 
 @Component
 public class TagMapper {
-     public TagResponseDto toDto(Tag tag) {
-        return TagResponseDto.builder()
-                .id(tag.getId())
-                .name(tag.getName())
-                .color(tag.getTagColor())
-                .status(tag.getStatus())
-                .keywords(tag.getKeywords().stream().map(TagKeyword::getName).collect(Collectors.toList()))
-                .mobileNumbers(tag.getNumbers().stream().map(TagNumber::getNumber).collect(Collectors.toList()))
-                .createdAt(tag.getCreatedAt())
-                .build();
-    }
+   public TagResponseDto toDto(Tag tag) {
+      return TagResponseDto.builder()
+            .id(tag.getId())
+            .name(tag.getName())
+            .color(tag.getTagColor())
+            .status(tag.getStatus())
+            .keywords(tag.getKeywords().stream().map(TagKeyword::getName).collect(Collectors.toList()))
+            .mobileNumbers(tag.getNumbers().stream().map(TagNumber::getNumber).collect(Collectors.toList()))
+            .createdAt(tag.getCreatedAt())
+            .build();
+   }
 
-     public Tag toEntity(TagRequestDto tagDto,User user) {
-       return Tag.builder()
-       .user(user)
-       .name(tagDto.getName())
-       .tagColor(tagDto.getColor())
-       .status(TagStatus.ACTIVE)
-       .createdAt(LocalDateTime.now())
-       .updatedAt(LocalDateTime.now())
-        .build();
-     }
+   public Tag toEntity(TagRequestDto tagDto, User user) {
+      return Tag.builder()
+            .user(user)
+            .name(tagDto.getName())
+            .tagColor(tagDto.getColor())
+            .status(TagStatus.ACTIVE)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
+   }
 }

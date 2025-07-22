@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.messaging.enums.CampaignStatus;
-import com.aigreentick.services.messaging.model.template.Template;
+import com.aigreentick.services.template.model.Template;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

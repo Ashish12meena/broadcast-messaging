@@ -29,13 +29,13 @@ import com.aigreentick.services.messaging.model.Broadcast;
 import com.aigreentick.services.messaging.model.BroadcastMedia;
 import com.aigreentick.services.messaging.model.Country;
 import com.aigreentick.services.messaging.model.Report;
-import com.aigreentick.services.messaging.model.template.Template;
 import com.aigreentick.services.messaging.repository.BroadCastMediaRepository;
 import com.aigreentick.services.messaging.repository.BroadCastRepository;
 import com.aigreentick.services.messaging.repository.CountryRepository;
-import com.aigreentick.services.messaging.repository.TemplateRepository;
 import com.aigreentick.services.messaging.service.interfaces.BroadcastInterface;
 import com.aigreentick.services.messaging.util.MessagingUtil;
+import com.aigreentick.services.template.model.Template;
+import com.aigreentick.services.template.repository.TemplateRepository;
 
 /**
  * Creates and dispatches a broadcast.

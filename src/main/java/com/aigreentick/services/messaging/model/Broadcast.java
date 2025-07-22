@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.messaging.enums.BroadcastStatus;
-import com.aigreentick.services.messaging.model.template.Template;
+import com.aigreentick.services.template.model.Template;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;

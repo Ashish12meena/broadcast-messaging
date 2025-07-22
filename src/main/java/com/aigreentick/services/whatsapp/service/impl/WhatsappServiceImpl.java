@@ -18,8 +18,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.aigreentick.services.common.enums.MessageStatusEnum;
-import com.aigreentick.services.messaging.dto.template.FacebookTemplateResponse;
-import com.aigreentick.services.messaging.dto.template.TemplateRequestDto;
+import com.aigreentick.services.template.dto.FacebookTemplateResponse;
+import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.whatsapp.dto.FacebookDeleteTemplateResponse;
 import com.aigreentick.services.whatsapp.dto.FacebookTemplateRequest;
 import com.aigreentick.services.whatsapp.dto.SendMessageResult;

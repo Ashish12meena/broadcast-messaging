@@ -14,6 +14,7 @@ import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.auth.service.interfaces.UserService;
 import com.aigreentick.services.common.exception.ResourceAlreadyExistsException;
 import com.aigreentick.services.common.exception.ResourceNotFoundException;
+import com.aigreentick.services.messaging.dto.CountryResponseDto;
 import com.aigreentick.services.messaging.dto.tag.TagRequestDto;
 import com.aigreentick.services.messaging.dto.tag.TagResponseDto;
 import com.aigreentick.services.messaging.enums.TagStatus;
@@ -23,6 +24,7 @@ import com.aigreentick.services.messaging.model.tag.TagKeyword;
 import com.aigreentick.services.messaging.model.tag.TagNumber;
 import com.aigreentick.services.messaging.model.tag.TagSpecifications;
 import com.aigreentick.services.messaging.repository.TagRepository;
+import com.aigreentick.services.messaging.util.PhoneNumberUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class TagServiceImpl {
     private final TagRepository tagRepository;
     private final UserService userService;
     private final TagMapper tagmapper;
+    private final CountryServiceImpl countryService;
 
     /**
      * Create or update a tag for a user with associated keywords.
@@ -44,10 +47,12 @@ public class TagServiceImpl {
 
         User user = getUser(userId);
 
+        CountryResponseDto country =  countryService.getCountryById(tagDto.getCountryId());
+
         Tag tag = tagmapper.toEntity(tagDto, user);
 
         List<TagKeyword> keywordEntities = toKeywordEntities(tagDto.getKeywords(), tag);
-        List<TagNumber> numberEntities = toNumberEntities(tagDto.getMobileNumbers(), tag);
+        List<TagNumber> numberEntities = toNumberEntities(tagDto.getMobileNumbers(), tag,country.getMobileCode());
 
         tag.setKeywords(keywordEntities);
         tag.setNumbers(numberEntities);
@@ -145,11 +150,14 @@ public class TagServiceImpl {
                 .collect(Collectors.toList());
     }
 
-    private List<TagNumber> toNumberEntities(List<String> numbers, Tag tag) {
-        return (numbers == null ? Collections.emptyList() : numbers)
-                .stream()
-                .map(n -> TagNumber.builder().number((String) n).tag(tag).build())
-                .collect(Collectors.toList());
-    }
+    private List<TagNumber> toNumberEntities(List<String> numbers, Tag tag, String mobileCode) {
+    return (numbers == null ? Collections.emptyList() : numbers)
+            .stream()
+            .map(number -> TagNumber.builder()
+                    .number(PhoneNumberUtils.buildWhatsAppNumber(mobileCode, (String) number))
+                    .tag(tag)
+                    .build())
+            .collect(Collectors.toList());
+}
 
 }

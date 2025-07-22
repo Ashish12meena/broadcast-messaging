@@ -10,4 +10,5 @@ public class TagRequestDto {
     private String color;
     private List<String> keywords;
     private List<String> mobileNumbers;
+    private long countryId;
 }

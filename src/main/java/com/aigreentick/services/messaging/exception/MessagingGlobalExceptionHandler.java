@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.aigreentick.services.common.dto.ErrorResponse;
+import com.aigreentick.services.template.exception.TemplateAlreadyExistsException;
+import com.aigreentick.services.template.exception.TemplateNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

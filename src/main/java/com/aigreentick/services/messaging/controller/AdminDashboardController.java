@@ -22,9 +22,9 @@ import com.aigreentick.services.common.dto.BlacklistRequestDto;
 import com.aigreentick.services.common.dto.BlacklistResponseDto;
 import com.aigreentick.services.common.enums.BlacklistType;
 import com.aigreentick.services.common.service.interfaces.BlacklistInterface;
-import com.aigreentick.services.messaging.dto.template.TemplateStatsDto;
-import com.aigreentick.services.messaging.model.template.Template;
-import com.aigreentick.services.messaging.service.impl.TemplateServiceImpl;
+import com.aigreentick.services.template.dto.TemplateStatsDto;
+import com.aigreentick.services.template.model.Template;
+import com.aigreentick.services.template.service.impl.TemplateServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 

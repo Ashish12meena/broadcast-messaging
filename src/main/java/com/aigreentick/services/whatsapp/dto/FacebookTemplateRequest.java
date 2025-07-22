@@ -2,7 +2,7 @@ package com.aigreentick.services.whatsapp.dto;
 
 import java.util.List;
 
-import com.aigreentick.services.messaging.dto.template.TemplateComponentRequestDto;
+import com.aigreentick.services.template.dto.TemplateComponentRequestDto;
 
 import lombok.Data;
 
