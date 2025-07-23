@@ -10,4 +10,5 @@ public interface UserService {
      User findByEmail(String email);
      boolean isMobileNumberExist(String mobileNumber);
      Optional<User> findById(Long id);
+     User getReferenceById(Long userId);
 }

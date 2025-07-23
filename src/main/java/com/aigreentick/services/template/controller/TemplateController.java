@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aigreentick.services.auth.service.impl.CustomUserDetails;
 import com.aigreentick.services.common.dto.ResponseMessage;
 import com.aigreentick.services.messaging.dto.PaginationRequestDto;
+import com.aigreentick.services.messaging.dto.ResponseStatus;
+import com.aigreentick.services.template.constants.TemplateConstants;
+import com.aigreentick.services.template.dto.CreateTemplateResponseDto;
 import com.aigreentick.services.template.dto.FacebookApiCredentialsDto;
-import com.aigreentick.services.template.dto.FacebookTemplateResponse;
 import com.aigreentick.services.template.dto.TemplateDto;
 import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.template.dto.TemplateResponseDto;
@@ -33,6 +35,14 @@ public class TemplateController {
 
     public TemplateController(TemplateServiceImpl templateService) {
         this.templateService = templateService;
+    }
+
+    //Create Template and send for approval
+    @PostMapping("/create")
+    public ResponseEntity<?> createTemplate(@RequestBody @Valid TemplateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        CreateTemplateResponseDto response = templateService.createTemplateForUser(dto, currentUser.getUsername());
+        return ResponseEntity.ok(new ResponseMessage<>(ResponseStatus.SUCCESS.name(),TemplateConstants.TEMPLATE_CREATED , response));
     }
 
     /**
@@ -51,12 +61,7 @@ public class TemplateController {
         return ResponseEntity.ok(new ResponseMessage<>("success", "Templates fetched successfully", templates));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createTemplate(@RequestBody @Valid TemplateRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails currentUser) {
-        FacebookTemplateResponse response = templateService.createTemplateForUser(dto, currentUser.getUsername());
-        return ResponseEntity.ok(new ResponseMessage<>("success", "Template created successfully", response));
-    }
+   
 
     @PutMapping("/update/{templateId}")
     public ResponseEntity<?> updateTemplate(

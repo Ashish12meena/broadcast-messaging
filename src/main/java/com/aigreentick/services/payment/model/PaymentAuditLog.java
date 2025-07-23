@@ -1,34 +1,36 @@
 package com.aigreentick.services.payment.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "vouchers")
+@Table(name = "payment_audit_logs")
 @Data
-public class Voucher {
+public class PaymentAuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String code;
+    private String entityType; // e.g. "TRANSACTION", "WALLET"
+    private Long entityId;
 
-    private BigDecimal amount;
+    private String action; // "CREATE", "UPDATE", "REVERSE"
 
-    private LocalDateTime validFrom;
-    private LocalDateTime validUntil;
+    @Lob
+    private String oldData;
 
-    private Integer maxUsage; // null for unlimited
-    private Integer perUserLimit;
+    @Lob
+    private String newData;
 
-    private boolean isActive;
+    private LocalDateTime timestamp;
 
-    private LocalDateTime createdAt;
+    private String performedBy;
 }
+

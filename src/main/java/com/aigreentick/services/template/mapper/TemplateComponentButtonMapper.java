@@ -34,7 +34,7 @@ public class TemplateComponentButtonMapper {
     }
     public TemplateComponentButton toTemplateComponentButtonEntity(TemplateComponentButtonRequestDto dto,TemplateComponent component,Template template){
         TemplateComponentButton templateComponentButton = new TemplateComponentButton();
-        templateComponentButton.setNumber(dto.getNumber());
+        templateComponentButton.setNumber(dto.getPhoneNumber());
         templateComponentButton.setComponent(component);
         templateComponentButton.setType(dto.getType());
         templateComponentButton.setTemplate(template);

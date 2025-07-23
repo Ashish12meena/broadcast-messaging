@@ -27,11 +27,13 @@ public class PhoneBookEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String phoneNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id")
     private Template template;
+
 
     @JdbcTypeCode(SqlTypes.JSON) // Hibernate 6+
     @Column(columnDefinition = "jsonb") // PostgreSQL-specific

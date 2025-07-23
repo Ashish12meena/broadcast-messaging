@@ -69,14 +69,15 @@ public class GroupMembersServiceImpl {
      * Soft-deletes a group member.
      */
     @Transactional
-    public boolean removeMemberFromGroup(Long groupId, Long groupMemberId,Long ownerId) {
+    public boolean removeMemberFromGroup(Long groupId, Long groupMemberId, Long ownerId) {
         Optional<GroupMembers> optionalGroupMember = groupMembersRepository.findByIdAndGroup_Id(groupMemberId, groupId);
         GroupMembers groupMember;
         if (optionalGroupMember.isPresent()) {
             groupMember = optionalGroupMember.get();
             if (groupMember.getGroup().getOwner().getId() == ownerId) {
                 groupMembersRepository.deleteById(groupMemberId);
-                log.info("User {} removed from group {}",groupMember.getMemberUser().getUsername(),groupMember.getGroup().getGroupName());
+                log.info("User {} removed from group {}", groupMember.getMemberUser().getUsername(),
+                        groupMember.getGroup().getGroupName());
             } else {
                 throw new PermissionNotFoundException("You don't have a permission to remove User");
             }
@@ -88,12 +89,12 @@ public class GroupMembersServiceImpl {
      * Removes all members of a group (soft-delete).
      */
     @Transactional
-    public List<GroupMemberRemoveResponseDto> removeAllMembersFromGroup(Long groupId,Long ownerId) {
+    public List<GroupMemberRemoveResponseDto> removeAllMembersFromGroup(Long groupId, Long ownerId) {
         Group group = groupService.getGroupById(groupId);
-        if (group.getOwner().getId()==ownerId) {
-            List<GroupMembers> members = groupMembersRepository.deleteAllByGroup_Id(groupId); 
-           return members.stream().map(member->
-            new GroupMemberRemoveResponseDto(member.getAddedBy().getUsername(),member.getMemberUser().getUsername())).toList();
+        if (group.getOwner().getId() == ownerId) {
+            List<GroupMembers> members = groupMembersRepository.deleteAllByGroup_Id(groupId);
+            return members.stream().map(member -> new GroupMemberRemoveResponseDto(member.getAddedBy().getUsername(),
+                    member.getMemberUser().getUsername())).toList();
         }
         log.info("All members removed from group {}", groupId);
         return null;

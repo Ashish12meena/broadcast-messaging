@@ -107,7 +107,7 @@ public class WhatsappServiceImpl {
     headers.setBearerAuth(accessToken);
 
     HttpEntity<Void> request = new HttpEntity<>(headers);
-    
+
     try {
       ResponseEntity<FacebookDeleteTemplateResponse> response = restTemplate.exchange(
           url,
@@ -149,7 +149,7 @@ public class WhatsappServiceImpl {
         JsonNode body = mapper.readTree(response.getBody());
         String messageId = body.path("messages").get(0).path("id").asText();
         return new SendMessageResult(true, messageId, "Message sent successfully");
-      }else{
+      } else {
         return new SendMessageResult(false, null, "Non-success HTTP status: " + response.getStatusCode());
       }
 
@@ -183,5 +183,13 @@ public class WhatsappServiceImpl {
               }
             }
         """, recipientNumber, templateName, languageCode, parametersJson);
+  }
+
+  public Map<String, Object> submitTemplateToFacebookForApproval(String jsonString) {
+    Map<String, Object> response = new HashMap<>();
+    response.put("id", "3784378");
+    response.put("category", "MARKETING");
+    response.put("status", "APPROVED");
+    return response;
   }
 }

@@ -2,6 +2,7 @@ package com.aigreentick.services.template.mapper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.aigreentick.services.auth.model.User;
-import com.aigreentick.services.template.dto.FacebookTemplateResponse;
 import com.aigreentick.services.template.dto.TemplateComponentResponseDto;
 import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.template.dto.TemplateResponseDto;
@@ -76,15 +76,21 @@ public class TemplateMapper {
         return template;
     }
 
-    public Template toTemplateEntity(TemplateRequestDto dto, User user , FacebookTemplateResponse response) {
+    public Template toTemplateEntity(TemplateRequestDto dto, User user, Map<String, Object> rawResponse) {
         Template template = new Template();
         template.setUser(user);
         template.setName(dto.getName());
         template.setWhatsappId(dto.getWabaId());
         template.setLanguage(dto.getLanguage());
-        template.setStatus(TemplateStatus.valueOf(response.getStatus().toUpperCase())); // Convert status to enum
-        template.setMetaTemplateId(response.getId());
-        template.setCategory(response.getCategory());
+        // Extract fields safely from rawResponse map
+        String status = (String) rawResponse.getOrDefault("status", "PENDING");
+        String metaTemplateId = (String) rawResponse.get("id");
+        String category = (String) rawResponse.get("category");
+
+        template.setStatus(TemplateStatus.valueOf(status.toUpperCase()));
+        template.setMetaTemplateId(metaTemplateId);
+        template.setCategory(category);
+        template.setResponse(rawResponse);
 
         // 💡 Set components_json as actual JSON
         JsonNode componentsJson = objectMapper.valueToTree(dto.getComponents());
