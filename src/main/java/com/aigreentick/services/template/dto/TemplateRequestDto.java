@@ -2,7 +2,6 @@ package com.aigreentick.services.template.dto;
 
 import java.util.List;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +16,5 @@ public class TemplateRequestDto {
     private List<TemplateComponentRequestDto> components;
     private String wabaId;
     private String accessToken;
-    private String apiVersion; 
+    private String apiVersion;
 }

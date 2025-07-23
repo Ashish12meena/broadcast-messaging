@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.kafka.common.errors.SerializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +40,7 @@ import com.aigreentick.services.template.service.interfaces.TemplateInterface;
 import com.aigreentick.services.whatsapp.service.impl.WhatsappServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -77,7 +77,7 @@ public class TemplateServiceImpl implements TemplateInterface {
             ObjectMapper mapper = new ObjectMapper();
             jsonRequest = mapper.writeValueAsString(requestBody);
         } catch (JsonProcessingException e) {
-            throw new SerializationException("Failed to serialize template request to JSON.", e);
+            throw new RuntimeJsonMappingException("Failed to serialize template request to JSON.");
         }
 
         // Submit template to Facebook
