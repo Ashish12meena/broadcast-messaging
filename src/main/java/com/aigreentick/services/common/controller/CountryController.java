@@ -1,4 +1,4 @@
-package com.aigreentick.services.messaging.controller;
+package com.aigreentick.services.common.controller;
 
 import java.util.List;
 
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aigreentick.services.common.dto.CountryResponseDto;
 import com.aigreentick.services.common.dto.ResponseMessage;
-import com.aigreentick.services.messaging.dto.CountryResponseDto;
 import com.aigreentick.services.messaging.service.interfaces.CountryInterface;
 
 @RestController

@@ -1,5 +1,7 @@
 package com.aigreentick.services.template.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -11,8 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TemplateComponentButtonRequestDto {
-    private String type;
+
+     private String type; // QUICK_REPLY, PHONE_NUMBER, URL
     private String text;
-    private String url;
+
+    // For PHONE_NUMBER
     private String phoneNumber;
+
+    // For URL
+    private String url;
+    private List<String> urlExamples;
 }

@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.aigreentick.services.messaging.dto.CountryResponseDto;
-import com.aigreentick.services.messaging.mapper.CountryMapper;
-import com.aigreentick.services.messaging.model.Country;
+import com.aigreentick.services.common.dto.CountryResponseDto;
+import com.aigreentick.services.common.mapper.CountryMapper;
+import com.aigreentick.services.common.model.Country;
 import com.aigreentick.services.messaging.repository.CountryRepository;
 import com.aigreentick.services.messaging.service.interfaces.CountryInterface;
 

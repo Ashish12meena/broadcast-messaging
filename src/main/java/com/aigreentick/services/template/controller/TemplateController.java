@@ -1,5 +1,7 @@
 package com.aigreentick.services.template.controller;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,35 +16,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aigreentick.services.auth.service.impl.CustomUserDetails;
+import com.aigreentick.services.auth.service.interfaces.UserService;
 import com.aigreentick.services.common.dto.ResponseMessage;
 import com.aigreentick.services.messaging.dto.PaginationRequestDto;
 import com.aigreentick.services.messaging.dto.ResponseStatus;
+import com.aigreentick.services.messaging.model.PhoneBookEntry;
+import com.aigreentick.services.messaging.repository.PhoneBookEntryRepository;
 import com.aigreentick.services.template.constants.TemplateConstants;
 import com.aigreentick.services.template.dto.CreateTemplateResponseDto;
 import com.aigreentick.services.template.dto.FacebookApiCredentialsDto;
 import com.aigreentick.services.template.dto.TemplateDto;
-import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.template.dto.TemplateResponseDto;
 import com.aigreentick.services.template.dto.TemplateUpdateRequest;
+import com.aigreentick.services.template.dto.TestTemplateRequestDto;
+import com.aigreentick.services.template.dto.buildTemplate.TemplateRequestDto;
+import com.aigreentick.services.template.model.Template;
+import com.aigreentick.services.template.repository.TemplateRepository;
 import com.aigreentick.services.template.service.impl.TemplateServiceImpl;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/templates")
 public class TemplateController {
     private final TemplateServiceImpl templateService;
-
-    public TemplateController(TemplateServiceImpl templateService) {
-        this.templateService = templateService;
-    }
-
-    //Create Template and send for approval
+    // Create Template and send for approval
     @PostMapping("/create")
     public ResponseEntity<?> createTemplate(@RequestBody @Valid TemplateRequestDto dto,
             @AuthenticationPrincipal CustomUserDetails currentUser) {
         CreateTemplateResponseDto response = templateService.createTemplateForUser(dto, currentUser.getUsername());
-        return ResponseEntity.ok(new ResponseMessage<>(ResponseStatus.SUCCESS.name(),TemplateConstants.TEMPLATE_CREATED , response));
+        return ResponseEntity
+                .ok(new ResponseMessage<>(ResponseStatus.SUCCESS.name(), TemplateConstants.TEMPLATE_CREATED, response));
     }
 
     /**
@@ -60,8 +67,6 @@ public class TemplateController {
                 pagination.getPage(), pagination.getSize());
         return ResponseEntity.ok(new ResponseMessage<>("success", "Templates fetched successfully", templates));
     }
-
-   
 
     @PutMapping("/update/{templateId}")
     public ResponseEntity<?> updateTemplate(
@@ -83,5 +88,34 @@ public class TemplateController {
                 templateId,
                 credentials);
         return ResponseEntity.ok(new ResponseMessage<>("success", "Template deleted successfully", deleted));
+    }
+
+    private final TemplateRepository templateRepository;
+    private final PhoneBookEntryRepository phoneBookEntryRepository;
+    private final UserService userService;
+
+    @PostMapping("/build-approval")
+    public ObjectNode buildApprovalTemplate(@RequestBody @Valid TemplateRequestDto dto){
+      return  templateService.buildRequestBodyForApproval(dto);
+    }
+
+    @PostMapping("/send")
+    public ObjectNode testTemplateSend(
+            @RequestBody TestTemplateRequestDto request,
+            @AuthenticationPrincipal CustomUserDetails loginUser) {
+
+
+        // 1. Fetch Template
+        Template template  = templateRepository.findById(request.getTemplateId())
+                .orElseThrow(() -> new IllegalArgumentException("Template not found"));
+
+        // 2. Fetch PhoneBookEntry
+        PhoneBookEntry entry = phoneBookEntryRepository
+                .findByUserIdAndPhoneNumber(loginUser.getId(), request.getPhoneNumber())
+                .orElseThrow(() -> new IllegalArgumentException("PhoneBookEntry not found"));
+
+        // 3. Build the message payload
+        Map<String, String> parameters = entry.getParametersJson();
+        return templateService.buildTemplateForSending(template, parameters, request.getPhoneNumber());
     }
 }

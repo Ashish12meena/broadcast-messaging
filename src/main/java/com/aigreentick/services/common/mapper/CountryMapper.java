@@ -1,9 +1,9 @@
-package com.aigreentick.services.messaging.mapper;
+package com.aigreentick.services.common.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.aigreentick.services.messaging.dto.CountryResponseDto;
-import com.aigreentick.services.messaging.model.Country;
+import com.aigreentick.services.common.dto.CountryResponseDto;
+import com.aigreentick.services.common.model.Country;
 
 @Component
 public class CountryMapper {

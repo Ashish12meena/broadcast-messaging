@@ -1,6 +1,8 @@
-package com.aigreentick.services.template.dto;
+package com.aigreentick.services.template.dto.buildTemplate;
 
 import java.util.List;
+
+import com.aigreentick.services.template.dto.TemplateComponentRequestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

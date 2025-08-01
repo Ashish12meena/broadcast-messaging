@@ -5,18 +5,28 @@ import java.util.HashMap;
 
 import org.springframework.stereotype.Component;
 
+import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.messaging.dto.phonebook.PhoneBookEntryRequestDto;
+import com.aigreentick.services.messaging.dto.phonebook.PhoneBookResponseDto;
 import com.aigreentick.services.messaging.model.PhoneBookEntry;
-import com.aigreentick.services.template.model.Template;
 
 @Component
 public class PhoneBookEntryMapper {
-    public PhoneBookEntry toEntity(PhoneBookEntryRequestDto dto, Template template) {
+    public PhoneBookEntry toEntity(PhoneBookEntryRequestDto dto,String phoneNumber, User user) {
         PhoneBookEntry entry = new PhoneBookEntry();
-        entry.setPhoneNumber(dto.getPhoneNumber());
-        entry.setTemplate(template);
-        entry.setParametersJson(dto.getCountryCode() != null ? dto.getParameters() : new HashMap<>());
+        entry.setPhoneNumber(phoneNumber);
+        entry.setUser(user);
+        entry.setName(dto.getName());
+        entry.setParametersJson(dto.getParameters() != null ? dto.getParameters() : new HashMap<>());
         entry.setCreatedAt(LocalDateTime.now());
         return entry;
+    }
+
+    public PhoneBookResponseDto toDto(PhoneBookEntry entry) {
+        PhoneBookResponseDto dto = new PhoneBookResponseDto();
+        dto.setName(entry.getName());
+        dto.setPhoneNumber(entry.getPhoneNumber());
+        dto.setParameters(entry.getParametersJson());
+        return dto;
     }
 }

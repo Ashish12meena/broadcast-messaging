@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import com.aigreentick.services.auth.exception.EmailAlreadyExistsException;
 import com.aigreentick.services.auth.exception.MobileNumberAlreadyExistsException;
 import com.aigreentick.services.common.dto.ErrorResponse;
+import com.aigreentick.services.messaging.dto.ResponseStatus;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import io.jsonwebtoken.security.SignatureException;
@@ -138,6 +139,23 @@ public class GlobalExceptionHandler {
                 log.warn("Upload size exceeded: {}", ex.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                                 buildError("error", "File size exceeds the maximum limit!", request.getRequestURI(),
+                                                HttpStatus.BAD_REQUEST));
+        }
+        @ExceptionHandler(DuplicateEntryException.class)
+        public ResponseEntity<ErrorResponse> handleDuplicateEntryException(DuplicateEntryException ex,
+                        HttpServletRequest request) {
+                log.warn("duplicate Entry: {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                                buildError(ResponseStatus.ERROR.name(), ex.getMessage(), request.getRequestURI(),
+                                                HttpStatus.BAD_REQUEST));
+        }
+
+        @ExceptionHandler(ArgumentCannotBeNullOrBlankException.class)
+        public ResponseEntity<ErrorResponse> handleArgumentCannotBeNullOrBlankException(ArgumentCannotBeNullOrBlankException ex,
+                        HttpServletRequest request) {
+                log.warn("argument cannot be null or blank : {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                                buildError(ResponseStatus.ERROR.name(), ex.getMessage(), request.getRequestURI(),
                                                 HttpStatus.BAD_REQUEST));
         }
 

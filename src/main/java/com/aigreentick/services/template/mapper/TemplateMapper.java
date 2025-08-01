@@ -11,8 +11,9 @@ import org.springframework.stereotype.Component;
 
 import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.template.dto.TemplateComponentResponseDto;
-import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.template.dto.TemplateResponseDto;
+import com.aigreentick.services.template.dto.buildTemplate.BaseTemplateRequestDto;
+import com.aigreentick.services.template.dto.buildTemplate.TemplateRequestDto;
 import com.aigreentick.services.template.enums.TemplateStatus;
 import com.aigreentick.services.template.model.Template;
 import com.aigreentick.services.template.model.TemplateComponent;
@@ -90,7 +91,6 @@ public class TemplateMapper {
         template.setStatus(TemplateStatus.valueOf(status.toUpperCase()));
         template.setMetaTemplateId(metaTemplateId);
         template.setCategory(category);
-        template.setResponse(rawResponse);
 
         // 💡 Set components_json as actual JSON
         JsonNode componentsJson = objectMapper.valueToTree(dto.getComponents());
@@ -104,6 +104,18 @@ public class TemplateMapper {
                 .collect(Collectors.toList());
 
         template.setComponents(components);
+
+        return template;
+    }
+
+    public Template toTemplateEntity(User user, String jsonRequest, BaseTemplateRequestDto dto,JsonNode componentsJson,JsonNode data) {
+        
+        Template template = new Template();
+        template.setUser(user);
+        template.setName(dto.getName());
+        template.setLanguage(dto.getLanguage());
+        template.setSubmissionPayload(jsonRequest);
+        template.setComponentsJson(componentsJson);
 
         return template;
     }

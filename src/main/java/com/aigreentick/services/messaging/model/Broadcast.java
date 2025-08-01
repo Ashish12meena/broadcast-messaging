@@ -3,6 +3,7 @@ package com.aigreentick.services.messaging.model;
 import java.time.LocalDateTime;
 
 import com.aigreentick.services.auth.model.User;
+import com.aigreentick.services.common.model.Country;
 import com.aigreentick.services.messaging.enums.BroadcastStatus;
 import com.aigreentick.services.template.model.Template;
 import com.fasterxml.jackson.annotation.JsonIgnore;

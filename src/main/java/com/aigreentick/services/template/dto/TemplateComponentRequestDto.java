@@ -16,6 +16,7 @@ public class TemplateComponentRequestDto {
     private String type; // HEADER, BODY, FOOTER, BUTTONS
     private String format; // TEXT, IMAGE, VIDEO, DOCUMENT
     private String text; // For TEXT-based components
-    private String mediaUrl; // For IMAGE, VIDEO, DOCUMENT (only used in HEADER)
+    private List<String> mediaUrls; // For IMAGE, VIDEO, DOCUMENT (only used in HEADER)
+    private List<String> textExamples; // example for text variable
     private List<TemplateComponentButtonRequestDto> buttons; // Only for BUTTON component
 }

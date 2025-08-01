@@ -7,10 +7,10 @@ import org.springframework.data.domain.Page;
 import com.aigreentick.services.template.dto.CreateTemplateResponseDto;
 import com.aigreentick.services.template.dto.FacebookApiCredentialsDto;
 import com.aigreentick.services.template.dto.TemplateDto;
-import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.template.dto.TemplateResponseDto;
 import com.aigreentick.services.template.dto.TemplateStatsDto;
 import com.aigreentick.services.template.dto.TemplateUpdateRequest;
+import com.aigreentick.services.template.dto.buildTemplate.TemplateRequestDto;
 import com.aigreentick.services.template.enums.TemplateStatus;
 import com.aigreentick.services.template.model.Template;
 

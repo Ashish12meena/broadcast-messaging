@@ -53,6 +53,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.getReferenceById(userId);
     }
 
+    @Override
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
    
 
 }

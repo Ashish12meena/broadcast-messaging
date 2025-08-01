@@ -22,13 +22,11 @@ import com.aigreentick.services.messaging.exception.ResponseStatusException;
 import com.aigreentick.services.messaging.exception.UnauthorizedTemplateAccessException;
 import com.aigreentick.services.template.dto.CreateTemplateResponseDto;
 import com.aigreentick.services.template.dto.FacebookApiCredentialsDto;
-import com.aigreentick.services.template.dto.TemplateComponentButtonRequestDto;
-import com.aigreentick.services.template.dto.TemplateComponentRequestDto;
 import com.aigreentick.services.template.dto.TemplateDto;
-import com.aigreentick.services.template.dto.TemplateRequestDto;
 import com.aigreentick.services.template.dto.TemplateResponseDto;
 import com.aigreentick.services.template.dto.TemplateStatsDto;
 import com.aigreentick.services.template.dto.TemplateUpdateRequest;
+import com.aigreentick.services.template.dto.buildTemplate.TemplateRequestDto;
 import com.aigreentick.services.template.enums.TemplateStatus;
 import com.aigreentick.services.template.exception.TemplateAlreadyExistsException;
 import com.aigreentick.services.template.exception.TemplateNotFoundException;
@@ -41,20 +39,21 @@ import com.aigreentick.services.whatsapp.service.impl.WhatsappServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TemplateServiceImpl implements TemplateInterface {
     private final TemplateRepository templateRepository;
     private final TemplateMapper templateMapper;
     private final UserService userService;
     private final WhatsappServiceImpl whatsappService;
+    private final BuildTemplateServiceImpl buildTemplateService;
 
     @Value("${pagination.page-size}")
     private int defaultPageSize;
@@ -69,7 +68,7 @@ public class TemplateServiceImpl implements TemplateInterface {
         }
 
         // Build the request body for Facebook approval
-        ObjectNode requestBody = buildRequestBodyForApproval(templateDto);
+        ObjectNode requestBody = buildTemplateService.buildRequestBodyForApproval(templateDto);
 
         // Convert ObjectNode to JSON String
         String jsonRequest;
@@ -88,7 +87,6 @@ public class TemplateServiceImpl implements TemplateInterface {
         Template template = templateMapper.toTemplateEntity(templateDto, user, rawResponse);
         template.setSubmissionPayload(jsonRequest);
         templateRepository.save(template);
-
         return CreateTemplateResponseDto.builder()
                 .id(template.getId())
                 .name(template.getName())
@@ -134,141 +132,6 @@ public class TemplateServiceImpl implements TemplateInterface {
         return templatePage.map(templateMapper::toTemplateDto);
     }
 
-    /**
-     * Builds the request body JSON for WhatsApp template approval.
-     * Delegates component-specific logic to helper methods for clarity.
-     */
-    private ObjectNode buildRequestBodyForApproval(TemplateRequestDto dto) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-
-        // Basic required fields for WhatsApp template
-        root.put("name", dto.getName());
-        root.put("language", dto.getLanguage());
-        root.put("category", dto.getCategory());
-
-        ArrayNode componentsArray = mapper.createArrayNode();
-
-        // Handle each component based on type
-        for (TemplateComponentRequestDto componentDto : dto.getComponents()) {
-            String type = componentDto.getType().toUpperCase();
-
-            ObjectNode componentNode = switch (type) {
-                case "HEADER" -> buildHeaderComponent(componentDto, mapper);
-                case "BODY" -> buildBodyComponent(componentDto, mapper);
-                case "FOOTER" -> buildFooterComponent(componentDto, mapper);
-                case "BUTTONS" -> buildButtonsComponent(componentDto, mapper);
-                default -> throw new IllegalArgumentException("Unsupported component type: " + type);
-            };
-
-            componentsArray.add(componentNode);
-        }
-
-        root.set("components", componentsArray);
-        return root;
-    }
-
-    /**
-     * Builds HEADER component with TEXT or media (IMAGE/VIDEO/DOCUMENT).
-     */
-    private ObjectNode buildHeaderComponent(TemplateComponentRequestDto dto, ObjectMapper mapper) {
-        ObjectNode headerNode = mapper.createObjectNode();
-        headerNode.put("type", "HEADER");
-        headerNode.put("format", dto.getFormat().toUpperCase());
-
-        ObjectNode example = mapper.createObjectNode();
-
-        if ("TEXT".equalsIgnoreCase(dto.getFormat())) {
-            headerNode.put("text", dto.getText());
-        } else {
-            // For media header, URL must be provided
-            if (dto.getMediaUrl() == null || dto.getMediaUrl().isBlank()) {
-                throw new IllegalArgumentException("Media URL is required for HEADER with format: " + dto.getFormat());
-            }
-
-            ArrayNode mediaExample = mapper.createArrayNode();
-            mediaExample.add(dto.getMediaUrl());
-
-            String key = switch (dto.getFormat().toUpperCase()) {
-                case "IMAGE" -> "header_image";
-                case "VIDEO" -> "header_video";
-                case "DOCUMENT" -> "header_document";
-                default -> throw new IllegalArgumentException("Unsupported HEADER format: " + dto.getFormat());
-            };
-
-            example.set(key, mediaExample);
-        }
-
-        headerNode.set("example", example);
-        return headerNode;
-    }
-
-    /**
-     * Builds BODY component with optional placeholder detection.
-     */
-    private ObjectNode buildBodyComponent(TemplateComponentRequestDto dto, ObjectMapper mapper) {
-        ObjectNode bodyNode = mapper.createObjectNode();
-        bodyNode.put("type", "BODY");
-        bodyNode.put("text", dto.getText());
-
-        // Only add example node if placeholders exist
-        if (dto.getText() != null && dto.getText().contains("{{")) {
-            ObjectNode example = mapper.createObjectNode();
-            ArrayNode bodyExamples = mapper.createArrayNode();
-            ArrayNode row = mapper.createArrayNode(); // empty row (no real example values)
-            bodyExamples.add(row);
-            example.set("body_text", bodyExamples);
-            bodyNode.set("example", example);
-        }
-
-        return bodyNode;
-    }
-
-    /**
-     * Builds FOOTER component containing static text.
-     */
-    private ObjectNode buildFooterComponent(TemplateComponentRequestDto dto, ObjectMapper mapper) {
-        ObjectNode footerNode = mapper.createObjectNode();
-        footerNode.put("type", "FOOTER");
-        footerNode.put("text", dto.getText());
-        return footerNode;
-    }
-
-    /**
-     * Builds BUTTONS component for URL or PHONE_NUMBER types.
-     */
-    private ObjectNode buildButtonsComponent(TemplateComponentRequestDto dto, ObjectMapper mapper) {
-        if (dto.getButtons() == null || dto.getButtons().isEmpty()) {
-            throw new IllegalArgumentException("Buttons required for BUTTONS component.");
-        }
-
-        ObjectNode buttonNode = mapper.createObjectNode();
-        buttonNode.put("type", "BUTTONS");
-
-        ArrayNode buttonsArray = mapper.createArrayNode();
-
-        for (TemplateComponentButtonRequestDto btn : dto.getButtons()) {
-            ObjectNode btnNode = mapper.createObjectNode();
-            btnNode.put("type", btn.getType().toUpperCase());
-
-            ObjectNode buttonPayload = mapper.createObjectNode();
-            buttonPayload.put("type", btn.getType().toUpperCase());
-            buttonPayload.put("text", btn.getText());
-
-            if ("URL".equalsIgnoreCase(btn.getType())) {
-                buttonPayload.put("url", btn.getUrl());
-            } else if ("PHONE_NUMBER".equalsIgnoreCase(btn.getType())) {
-                buttonPayload.put("phone_number", btn.getPhoneNumber());
-            }
-
-            btnNode.set("button", buttonPayload);
-            buttonsArray.add(btnNode);
-        }
-
-        buttonNode.set("buttons", buttonsArray);
-        return buttonNode;
-    }
-
     public void updateTemplateStatus(Long id, TemplateStatus status, String reason) {
         Template template = templateRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
         template.setStatus(status);
@@ -302,8 +165,6 @@ public class TemplateServiceImpl implements TemplateInterface {
             template.setWhatsappId(request.getWhatsappId());
         if (request.getPayload() != null)
             template.setSubmissionPayload(request.getPayload());
-        if (request.getResponse() != null)
-            template.setResponse(request.getResponse());
 
         // ✅ Update components (replace all)
         if (request.getComponents() != null) {
@@ -462,10 +323,19 @@ public class TemplateServiceImpl implements TemplateInterface {
     }
 
     public boolean existsById(Long templateId) {
-       if (templateId!=null) {
-         return templateRepository.existsById(templateId);
-       }else{
-          throw new IllegalArgumentException("Template ID must not be null");
-       }
+        if (templateId != null) {
+            return templateRepository.existsById(templateId);
+        } else {
+            throw new IllegalArgumentException("Template ID must not be null");
+        }
     }
+
+    public ObjectNode buildRequestBodyForApproval(TemplateRequestDto dto) {
+        return buildTemplateService.buildRequestBodyForApproval(dto);
+    }
+
+    public ObjectNode buildTemplateForSending(Template template, Map<String,String> parameters, String phoneNumber) {
+        return buildTemplateService.buildTemplateForSending(template, parameters, phoneNumber);
+    }
+
 }

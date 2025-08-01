@@ -11,4 +11,5 @@ public interface UserService {
      boolean isMobileNumberExist(String mobileNumber);
      Optional<User> findById(Long id);
      User getReferenceById(Long userId);
+     boolean existsById(Long userId);
 }

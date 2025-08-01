@@ -6,6 +6,7 @@ import java.util.Map;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.template.model.Template;
 
 import jakarta.persistence.Column;
@@ -27,12 +28,13 @@ public class PhoneBookEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
     private String phoneNumber;
 
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id")
-    private Template template;
+    @JoinColumn(name = "user_id")
+    private User user;
 
 
     @JdbcTypeCode(SqlTypes.JSON) // Hibernate 6+

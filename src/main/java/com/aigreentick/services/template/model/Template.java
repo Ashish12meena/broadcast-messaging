@@ -62,7 +62,7 @@ public class Template {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private Map<String, Object> response;
+    private JsonNode response;
 
     @Column(name = "components_json", columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
@@ -82,5 +82,7 @@ public class Template {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    
 
 }

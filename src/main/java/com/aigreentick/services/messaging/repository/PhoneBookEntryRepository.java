@@ -10,11 +10,13 @@ import com.aigreentick.services.messaging.model.PhoneBookEntry;
 
 @Repository
 public interface PhoneBookEntryRepository extends JpaRepository<PhoneBookEntry,Long> {
+    boolean existsByPhoneNumber(String phoneNumber);
 
-    boolean existsByPhoneNumberAndTemplateId(String phoneNumber, long templateId);
+    boolean existsByPhoneNumberAndUserId(String phoneNumber, long userId);
 
-    List<PhoneBookEntry> findAllByTemplateId(Long templateId);
+    List<PhoneBookEntry> findAllByUserId(Long userId);
 
-    Optional<PhoneBookEntry> findByTemplateIdAndPhoneNumber(Long templateId, String phoneNumber);
-    
+    Optional<List<PhoneBookEntry>> findByUserIdAndPhoneNumberIn(long userId, List<String> phoneNumbers);
+
+    Optional<PhoneBookEntry> findByUserIdAndPhoneNumber(Long userId, String phoneNumber);
 }

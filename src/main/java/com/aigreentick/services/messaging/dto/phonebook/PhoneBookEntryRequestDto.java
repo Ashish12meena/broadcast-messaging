@@ -7,8 +7,6 @@ import lombok.Data;
 
 @Data
 public class PhoneBookEntryRequestDto {
-    @NotNull(message = "Template can not be null")
-    private long templateId;
 
     private String name;
 
