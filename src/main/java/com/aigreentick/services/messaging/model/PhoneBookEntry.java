@@ -7,7 +7,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import com.aigreentick.services.auth.model.User;
-import com.aigreentick.services.template.model.Template;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

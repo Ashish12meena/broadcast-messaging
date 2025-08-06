@@ -27,6 +27,7 @@ public class WalletTopUpRequest {
     private Wallet wallet;
 
     private BigDecimal requestedAmount;
+    
     private String providerReference;
 
     @Enumerated(EnumType.STRING)

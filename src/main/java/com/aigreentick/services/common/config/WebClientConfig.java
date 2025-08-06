@@ -20,8 +20,13 @@ import java.util.concurrent.TimeUnit;
 public class WebClientConfig {
 
     private static final int CONNECT_TIMEOUT_MS = 5000; // 5 seconds
-    private static final int READ_TIMEOUT_SEC = 10;     // 10 seconds
-    private static final int WRITE_TIMEOUT_SEC = 10;    // 10 seconds
+    private static final int READ_TIMEOUT_SEC = 10; // 10 seconds
+    private static final int WRITE_TIMEOUT_SEC = 10; // 10 seconds
+
+    @Bean
+    public WebClient webClient(WebClient.Builder builder) {
+        return builder.build();
+    }
 
     @Bean
     public WebClient.Builder webClientBuilder() {
@@ -30,10 +35,8 @@ public class WebClientConfig {
         HttpClient httpClient = HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT_MS)
                 .responseTimeout(Duration.ofSeconds(READ_TIMEOUT_SEC))
-                .doOnConnected(conn ->
-                        conn.addHandlerLast(new ReadTimeoutHandler(READ_TIMEOUT_SEC, TimeUnit.SECONDS))
-                            .addHandlerLast(new WriteTimeoutHandler(WRITE_TIMEOUT_SEC, TimeUnit.SECONDS))
-                );
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(READ_TIMEOUT_SEC, TimeUnit.SECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(WRITE_TIMEOUT_SEC, TimeUnit.SECONDS)));
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))

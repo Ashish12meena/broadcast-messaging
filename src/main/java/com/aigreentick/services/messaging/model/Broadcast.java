@@ -53,9 +53,8 @@ public class Broadcast {
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id")
-    private Template template;
+    @Column(name = "template_id")
+    private String templateId;
 
     @Column(name = "campany_name")
     private String campanyName;
@@ -81,11 +80,11 @@ public class Broadcast {
 
     @Lob
     @Column(name = "recipients")
-    private String recipients; 
+    private String recipients;
 
     @Lob
     @Column(name = "payload")
-    private String payload; 
+    private String payload;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

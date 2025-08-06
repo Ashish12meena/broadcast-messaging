@@ -1,6 +1,5 @@
 package com.aigreentick.services.messaging.model.group;
 
-
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import com.aigreentick.services.auth.model.User;
@@ -10,15 +9,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(
-    name = "send_by_groups",
-    indexes = {
+@Table(name = "send_by_groups", indexes = {
         @Index(name = "idx_send_by_groups_user_id", columnList = "user_id"),
         @Index(name = "idx_send_by_groups_template_id", columnList = "template_id"),
         @Index(name = "idx_send_by_groups_group_id", columnList = "group_id"),
         @Index(name = "idx_send_by_groups_country_id", columnList = "country_id")
-    }
-)
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,9 +27,8 @@ public class SendByGroup {
     @JoinColumn(name = "user_id", nullable = false)
     private User initiatedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id", nullable = false)
-    private Template template;
+    @Column(name = "template_id")
+    private String templateId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)

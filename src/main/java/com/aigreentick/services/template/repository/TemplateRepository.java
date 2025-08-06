@@ -5,25 +5,23 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.aigreentick.services.auth.model.User;
 import com.aigreentick.services.template.enums.TemplateStatus;
 import com.aigreentick.services.template.model.Template;
+// import com.aigreentick.services.template.dto.CategoryCountDto;
+// import com.aigreentick.services.template.dto.StatusCountDto;
 
 @Repository
-public interface TemplateRepository extends JpaRepository<Template, Long> {
+public interface TemplateRepository extends MongoRepository<Template, String> {
 
     Page<Template> findAll(Pageable pageable);
 
-    Page<Template> findByUser(User user, Pageable pageable);
+    Page<Template> findByUserIdAndNameContainingIgnoreCase(Long userId, String search, Pageable pageable);
 
-    Page<Template> findByUserAndNameContainingIgnoreCase(User user, String search, Pageable pageable);
-
-    Optional<Template> findByIdAndUserId(Long id, Long userId);
+    Optional<Template> findByIdAndUserId(String id, Long userId);
 
     List<Template> findByUserId(Long userId);
 
@@ -35,22 +33,27 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
     List<Template> findByNameContainingIgnoreCaseOrWhatsappIdContainingIgnoreCase(String name, String waId);
 
-    Page<Template> findAll(Specification<Template> spec, Pageable pageable);
-
-    @Query("SELECT t.status, COUNT(t) FROM Template t WHERE t.deletedAt IS NULL GROUP BY t.status")
-    List<Object[]> countByStatusGrouped();
-
-    @Query("SELECT t.category, COUNT(t) FROM Template t WHERE t.deletedAt IS NULL GROUP BY t.category")
-    List<Object[]> countByCategoryGrouped();
-
     long countByDeletedAtIsNull();
 
     List<Template> findByStatus(String status);
 
     Optional<Template> findByName(String name);
 
-    Page<Template> findByUserAndStatusAndNameContainingIgnoreCase(User user, TemplateStatus statusEnum, String search,
-            Pageable pageable);
+    Page<Template> findByUserIdAndStatusAndNameContainingIgnoreCase(Long userId, TemplateStatus statusEnum, String search, Pageable pageable);
 
-    Page<Template> findByUserAndStatus(User user, TemplateStatus statusEnum, Pageable pageable);
+    Page<Template> findByUserIdAndStatus(Long userId, TemplateStatus statusEnum, Pageable pageable);
+
+    // @Aggregation(pipeline = {
+    //     "{ $match: { deletedAt: null } }",
+    //     "{ $group: { _id: '$status', count: { $sum: 1 } } }",
+    //     "{ $project: { status: '$_id', count: 1, _id: 0 } }"
+    // })
+    // List<StatusCountDto> countByStatusGrouped();
+
+    // @Aggregation(pipeline = {
+    //     "{ $match: { deletedAt: null } }",
+    //     "{ $group: { _id: '$category', count: { $sum: 1 } } }",
+    //     "{ $project: { category: '$_id', count: 1, _id: 0 } }"
+    // })
+    // List<CategoryCountDto> countByCategoryGrouped();
 }

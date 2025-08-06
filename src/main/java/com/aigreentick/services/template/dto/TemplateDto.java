@@ -1,5 +1,6 @@
 package com.aigreentick.services.template.dto;
 
+import com.aigreentick.services.template.dto.buildTemplate.BaseTemplateRequestDto;
 import com.aigreentick.services.template.model.Template;
 
 import lombok.AllArgsConstructor;
@@ -10,11 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateDto {
-    private Long id;
+    private String id;
     private String name;
     private String category;
     private String language;
     private String status;
+    private BaseTemplateRequestDto template;
 
     public TemplateDto(Template template) {
         this.id = template.getId();

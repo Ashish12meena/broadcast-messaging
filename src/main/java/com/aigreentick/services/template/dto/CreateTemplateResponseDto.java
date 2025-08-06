@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CreateTemplateResponseDto {
-    private Long id;
+    private String id;
     private String name;
     private String status;
     private String category;

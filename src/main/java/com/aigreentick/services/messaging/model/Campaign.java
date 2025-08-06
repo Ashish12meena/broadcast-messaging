@@ -1,6 +1,5 @@
 package com.aigreentick.services.messaging.model;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,9 +33,8 @@ public class Campaign {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id", nullable = false)
-    private Template template;
+    @Column(name = "template_id")
+    private String templateId;
 
     @Column
     private Integer whatsapp;
@@ -78,4 +76,3 @@ public class Campaign {
     private LocalDateTime deletedAt;
 
 }
-

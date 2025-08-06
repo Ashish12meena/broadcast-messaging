@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TemplateComponentButtonResponseDto {
-     private Long id;
-    private Long templateId;
+    private String templateId;
     private Long componentId;
     private String type;
     private String number;

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class BroadcastRequestDTO {
-    private Long temlateId;
+    private String temlateId;
     private String campanyName;
     private Long countryId;
     private List<String> mobileNumbers;

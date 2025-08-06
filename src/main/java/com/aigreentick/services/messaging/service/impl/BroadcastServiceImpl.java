@@ -154,7 +154,6 @@ public class BroadcastServiceImpl implements BroadcastInterface {
             Country country, Template template) {
         Broadcast broadcast = new Broadcast();
         broadcast.setUser(user);
-        broadcast.setTemplate(template);
         broadcast.setCountry(country);
         broadcast.setCampanyName(dto.getCampanyName());
         broadcast.setWhatsappId(template.getWhatsappId());

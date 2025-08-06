@@ -86,30 +86,30 @@ public class AdminDashboardController {
         return ResponseEntity.ok(blacklistService.addToBlacklistByAdmin(blacklistRequestDto));
     }
 
-    @GetMapping("/templates")
-    public ResponseEntity<Page<Template>> getFilteredTemplates(
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String waId,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Page<Template> result = templateService.getAdminFilteredTemplates(
-                userId, status, name, waId, category, fromDate, toDate, page, size);
-        return ResponseEntity.ok(result);
-    }
+    // @GetMapping("/templates")
+    // public ResponseEntity<Page<Template>> getFilteredTemplates(
+    //         @RequestParam(required = false) Long userId,
+    //         @RequestParam(required = false) String status,
+    //         @RequestParam(required = false) String name,
+    //         @RequestParam(required = false) String waId,
+    //         @RequestParam(required = false) String category,
+    //         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+    //         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+    //         @RequestParam(defaultValue = "0") int page,
+    //         @RequestParam(defaultValue = "20") int size) {
+    //     Page<Template> result = templateService.getAdminFilteredTemplates(
+    //             userId, status, name, waId, category, fromDate, toDate, page, size);
+    //     return ResponseEntity.ok(result);
+    // }
 
-    @GetMapping("/templates/stats")
-    public ResponseEntity<TemplateStatsDto> getTemplateStats() {
-        TemplateStatsDto stats = templateService.getTemplateStats();
-        return ResponseEntity.ok(stats);
-    }
+    // @GetMapping("/templates/stats")
+    // public ResponseEntity<TemplateStatsDto> getTemplateStats() {
+    //     TemplateStatsDto stats = templateService.getTemplateStats();
+    //     return ResponseEntity.ok(stats);
+    // }
 
     @DeleteMapping("/delete/templates/{templateId}")
-    public ResponseEntity<?> deleteTemplateByAdmin(@PathVariable Long templateId) {
+    public ResponseEntity<?> deleteTemplateByAdmin(@PathVariable String templateId) {
         boolean deleted = templateService.adminDeleteTemplate(templateId);
         return deleted
                 ? ResponseEntity.noContent().build()

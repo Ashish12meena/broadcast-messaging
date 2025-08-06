@@ -12,7 +12,6 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "send_messages", indexes = {
     @Index(name = "idx_send_messages_user_id", columnList = "user_id"),
-    @Index(name = "idx_send_messages_template_id", columnList = "template_id"),
     @Index(name = "idx_send_messages_country_id", columnList = "country_id")
 })
 @Data
@@ -30,7 +29,7 @@ public class SendMessage {
 
     
     @Column(name = "template_id", nullable = false)
-    private Long templateId;
+    private String templateId;
 
     
     @Column(name = "country_id", nullable = false)

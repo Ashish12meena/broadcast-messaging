@@ -35,7 +35,6 @@ import com.aigreentick.services.messaging.mapper.ReportMapper;
 import com.aigreentick.services.messaging.model.Report;
 import com.aigreentick.services.messaging.repository.ReportRepository;
 import com.aigreentick.services.messaging.service.interfaces.ReportInterface;
-import com.aigreentick.services.whatsapp.service.impl.WhatsappServiceImpl;
 import com.mongodb.client.result.UpdateResult;
 
 @Service
@@ -43,19 +42,17 @@ public class ReportServiceImpl implements ReportInterface {
 
     private static final Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
 
-    private final WhatsappServiceImpl whatsappService;
     private final MongoTemplate mongoTemplate;
     private final ExecutorService whatsappExecutor;
     private final Semaphore semaphore;
     private final ReportRepository reportRepository;
     private final ReportMapper reportMapper;
 
-    public ReportServiceImpl(WhatsappServiceImpl whatsappService, MongoTemplate mongoTemplate,
+    public ReportServiceImpl( MongoTemplate mongoTemplate,
             @Qualifier("whatsappExecutor") ExecutorService whatsappExecutor,
             Semaphore whatsappConcurrencySemaphore,
             ReportRepository reportRepository,
             ReportMapper reportMapper) {
-        this.whatsappService = whatsappService;
         this.mongoTemplate = mongoTemplate;
         this.whatsappExecutor = whatsappExecutor;
         this.semaphore = whatsappConcurrencySemaphore;
@@ -213,15 +210,15 @@ public class ReportServiceImpl implements ReportInterface {
 
     private Report processReport(Report report, String template) {
         try {
-            Map<String, Object> response = whatsappService.sendMessage(report.getMobile(), template);
-            report.setMessageStatus((MessageStatusEnum)response.get("status"));
-            report.setMessageId((String) response.get("messageId"));
-            report.setWaId((String) response.get("waId"));
-            report.setStatus(
-                MessageStatusEnum.DELIVERED == report.getMessageStatus()
-                    ? ReportStatus.SUCCESS
-                    : ReportStatus.FAILED
-            );
+            // Map<String, Object> response = whatsappService.sendMessage(report.getMobile(), template);
+            // report.setMessageStatus((MessageStatusEnum)response.get("status"));
+            // report.setMessageId((String) response.get("messageId"));
+            // report.setWaId((String) response.get("waId"));
+            // report.setStatus(
+            //     MessageStatusEnum.DELIVERED == report.getMessageStatus()
+            //         ? ReportStatus.SUCCESS
+            //         : ReportStatus.FAILED
+            // );
         } catch (Exception e) {
             log.error("Failed to send WhatsApp message to {}", report.getMobile(), e);
             report.setStatus(ReportStatus.FAILED);
