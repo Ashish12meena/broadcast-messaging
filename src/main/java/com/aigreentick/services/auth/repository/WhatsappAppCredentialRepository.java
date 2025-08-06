@@ -1,5 +1,6 @@
 package com.aigreentick.services.auth.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,8 @@ public interface WhatsappAppCredentialRepository extends JpaRepository<WhatsappA
     """)
     Optional<WhatsappAppCredential> findActiveByUserId(@Param("userId") Long userId);
 
-    
+    List<WhatsappAppCredential> findAllByWabaId(Long wabaId);
+
+
 
 }
